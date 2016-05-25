@@ -1,0 +1,7 @@
+pps_energy_tracker.content:
+  path: '/energy_tracker'
+  defaults:
+    _controller: 'Drupal\pps_energy_tracker\Controller\Energy_Tracker_Controller::content'
+    _title: 'PPS Energy Tracker - Home'
+  requirments:
+    _permission: 'access content'

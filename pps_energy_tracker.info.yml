@@ -1,0 +1,8 @@
+name: PPS Energy Tracker
+type: module
+description: 'PPS Energy Tracker, provides the end user with a means to see historical and predictive electricity pricing'
+core: 8.x
+
+configure: pps_energy_tracker.settings
+
+libraries:

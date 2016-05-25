@@ -1,0 +1,28 @@
+<?php
+/**
+* @file
+* PPS Energy Tracker, provides the end user with a means to see historical and predictive electricity pricing.
+* This file in particular routes the various pages to the correct TWIG templates.
+*/
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+* Implements hook_theme()
+*/
+
+/**
+ * Implements hook_theme().
+ */
+
+//TODO: Remove test variable once it is verfied as correctly wired
+function pps_energy_tracker_theme($existing, $type, $theme, $path) {
+    return array(
+        'pps_energy_tracker' => array(
+          'variables' => array(
+            'test_var' => NULL,
+          ),
+          'template' => 'pps_energy_tracker',
+        ),
+    );
+}

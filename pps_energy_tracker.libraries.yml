@@ -1,0 +1,5 @@
+pps_energy_tracker_css:
+  version: VERSION
+  css:
+    base:
+      css/style.css: {}
