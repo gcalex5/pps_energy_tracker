@@ -20,4 +20,28 @@ class Energy_Tracker_Controller extends ControllerBase {
             '#test_var' => $this->t('Test Var 1'),
         );
     }
+    public function generic_graphs(){
+        return array(
+            '#theme' => 'pps_energy_tracker_generic_graphs',
+            '#test_var' => $this->t('Test Var 1'),
+        );
+    }
+    public function electricity_graphs(){
+        return array(
+            '#theme' => 'pps_energy_tracker_electricity_graphs',
+            '#test_var' => $this->t('Test Var 1'),
+        );
+    }
+    public function natural_gas_graphs(){
+        return array(
+            '#theme' => 'pps_energy_tracker_natural_gas_graphs',
+            '#test_var' => $this->t('Test Var 1'),
+        );
+    }
+    public function account_management(){
+        return array(
+            '#theme' => 'pps_energy_tracker_account_management',
+            '#test_var' => $this->t('Test Var 1'),
+        );
+    }
 }

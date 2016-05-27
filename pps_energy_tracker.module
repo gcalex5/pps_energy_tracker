@@ -15,7 +15,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
  * Implements hook_theme().
  */
 
-//TODO: Remove test variable once it is verfied as correctly wired
+//TODO: Remove test variable once it is verified as correctly wired
 function pps_energy_tracker_theme($existing, $type, $theme, $path) {
     return array(
         'pps_energy_tracker' => array(
@@ -23,6 +23,30 @@ function pps_energy_tracker_theme($existing, $type, $theme, $path) {
             'test_var' => NULL,
           ),
           'template' => 'pps_energy_tracker',
+        ),
+        'pps_energy_tracker_account_management' => array(
+          'variables' => array(
+            'test_var' => NULL,
+          ),
+          'template' => 'pps_energy_tracker_account_management',
+        ),
+        'pps_energy_tracker_electricity_graphs' => array(
+            'variables' => array(
+                'test_var' => NULL,
+            ),
+            'template' => 'pps_energy_tracker_electricity_graphs',
+        ),
+        'pps_energy_tracker_natural_gas_graphs' => array(
+            'variables' => array(
+                'test_var' => NULL,
+            ),
+            'template' => 'pps_energy_tracker_natural_gas_graphs',
+        ),
+        'pps_energy_tracker_generic_graphs' => array(
+            'variables' => array(
+                'test_var' => NULL,
+            ),
+            'template' => 'pps_energy_tracker_generic_graphs',
         ),
     );
 }

@@ -1,6 +1,6 @@
 {
-  "name": "drupal/pps_energy_tracker"
-  "description": "PPS Energy Tracker, provides the end user with a means to see historical and predictive electricity pricing"
-  "type": "drupal-module"
-  "license": "placeholder"
+  "name": "drupal/pps_energy_tracker",
+  "description": "PPS Energy Tracker, provides the end user with a means to see historical and predictive electricity pricing",
+  "type": "drupal-module",
+  "license": "placeholder",
 }
