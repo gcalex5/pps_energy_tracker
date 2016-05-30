@@ -29,6 +29,10 @@ class Energy_Tracker_Controller extends ControllerBase {
      * @return array
      */
     public function generic_graphs(){
+        $generic_controller = new Generic_Charts_Controller;
+        $pricing_data = $generic_controller->pricingController('2018', 'On Peak');
+        $foo = 1+1;
+
         return array(
             '#theme' => 'pps_energy_tracker_generic_graphs',
             '#test_var' => $this->t('Test Var 1'),
