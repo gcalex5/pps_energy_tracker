@@ -20,6 +20,14 @@ class Energy_Tracker_Controller extends ControllerBase {
             '#test_var' => $this->t('Test Var 1'),
         );
     }
+
+    /**
+     * Generic Charts Controller function
+     * Called on page load.
+     * Form function then takes over.
+     * AJAX -> Calls to the Generic_Charts_Controller file to generate the graphing points and draws the graph
+     * @return array
+     */
     public function generic_graphs(){
         return array(
             '#theme' => 'pps_energy_tracker_generic_graphs',
