@@ -53,6 +53,7 @@ class Generic_Charts_Controller {
    * @param $graph_type - the type of graph that needs drawn On/Off/Mixed
    * @return array - Return an array containing the queried data 0 - On Peak 1 - Off Peak
    */
+  //TODO: DB Query is depecrated will need to change to a db select Drupal 8 style function
   public function queryData($graph_choice, $graph_type){
       //TODO: Change queries to be dependent on user input
       $query = 'Select purchase_date, ';
@@ -105,14 +106,17 @@ class Generic_Charts_Controller {
         $current_keys = array_keys($data_array[$i]);
         $this->MAX_DATE = new \DateTime($current_keys[sizeof($current_keys) - 3]);
       do{
-        for($j=0; $j<12; $j++){
-          $current_date_key = $this->ARRAY_DATE_KEYS[$j];
-          $current_price = $data_array[$i][$this->PRICING_START->format('Y-m-d')]->$current_date_key;
-          if($current_price > 0.0001){
-            $monthly_on_total += (($current_price / 1000) * $this->MONTHLY_USAGE);
-          }
-          else{
-            $zero_counter++;
+        $current_day_formatted = $this->PRICING_START->format('Y-m-d');
+        if(isset($data_array[$i][$current_day_formatted])){
+          for($j=0; $j<12; $j++){
+            $current_date_key = $this->ARRAY_DATE_KEYS[$j];
+            $current_price = $data_array[$i][$current_day_formatted]->$current_date_key;
+            if($current_price > 0.0001){
+              $monthly_on_total += (($current_price / 1000) * $this->MONTHLY_USAGE);
+            }
+            else{
+              $zero_counter++;
+            }
           }
         }
         /**
