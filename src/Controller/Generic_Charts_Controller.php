@@ -9,7 +9,6 @@
 namespace Drupal\pps_energy_tracker\Controller;
 use Drupal\Core\Render\Element\Date;
 use Symfony\Component\Validator\Constraints\DateTime;
-use Symfony\Component\Validator\Constraints\Null;
 
 class Generic_Charts_Controller {
   public $ON_PEAK_PRICES = array(array()); //On Peak Pricing Data

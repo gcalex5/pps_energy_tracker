@@ -10,7 +10,15 @@
 
 {{ attach_library('pps_energy_tracker/pps_energy_tracker_css') }}
 
-<div>
-    <p>Hello World: Energy Tracker - Generic Graphs</p>
+<div id="energy_tracker_container">
+    <div id="graph_form">
+        <p>Generic Form Foo Block</p>
+        {{ generic_graph_form_block }}
+        <p>Generic Post Form Foo Block</p>
+    </div>
+    <div class="graph-content">
+        <p>Graph Content Foo</p>
+    </div>
+
     <a href="/energy_tracker">Back to Energy Tracker Home</a>
 </div>
