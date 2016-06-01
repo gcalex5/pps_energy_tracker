@@ -111,6 +111,7 @@ class Generic_Charts_Controller {
           for($j=0; $j<12; $j++){
             $current_date_key = $this->ARRAY_DATE_KEYS[$j];
             $current_price = $data_array[$i][$current_day_formatted]->$current_date_key;
+            //Zero Counter is probably not necessary here.
             if($current_price > 0.0001){
               $monthly_on_total += (($current_price / 1000) * $this->MONTHLY_USAGE);
             }
@@ -119,12 +120,13 @@ class Generic_Charts_Controller {
             }
           }
         }
+        //TODO: Off and Mixed Pricing
         /**
          * Calculate the price for today and add it to the pricing list
          *
          * Price = (Term Cost / (Term Vol - (Num Zeroes * 100K ))
          */
-        if($zero_counter != 12){
+        if($monthly_on_total > 0.00001 && $zero_counter == 0){
           $price = ($monthly_on_total + $monthly_off_total) / (($this->MONTHLY_USAGE * 12) - ($zero_counter * $this->MONTHLY_USAGE));
           $temp_array[$this->PRICING_START->format('Y-m-d')][] = $price;
         }
@@ -132,7 +134,6 @@ class Generic_Charts_Controller {
           //We have 12 0's nothing is necessary
         }
         //Flush variables
-        //TODO: Flush variables?
         $monthly_on_total = 0;
         $zero_counter = 0;
         $monthly_off_total = 0;
