@@ -10,6 +10,7 @@
 //TODO: refactor this directory to lowercase. Changes will need to be made in the routing and PHP file unless we are refactoring all packages to uppercase.
 namespace Drupal\pps_energy_tracker\Controller;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\block_content\Entity\BlockContent;
 
 class Energy_Tracker_Controller extends ControllerBase {
 
@@ -30,12 +31,18 @@ class Energy_Tracker_Controller extends ControllerBase {
      */
     public function generic_graphs(){
         $generic_controller = new Generic_Charts_Controller;
+        //TODO: Remove this code once the block can be pragmatically called
+        //$block = \Drupal::entityManager()->getStorage('block_content')->load($block_id);
+        //$block_view = \Drupal::entityManager()->getViewBuilder('block_content')->view($block);
+
+        $block_id = ('generic_graph_form_block');
+        $custom_block = \Drupal::service('plugin.manager.block')->createInstance($block_id, []);
+        $block_content = $custom_block->build();
         $pricing_data = $generic_controller->pricingController('2018', 'On Peak');
-        $foo = 1+1;
 
         return array(
             '#theme' => 'pps_energy_tracker_generic_graphs',
-            '#test_var' => $this->t('Test Var 1'),
+            '#element_content' => $block_content,
         );
     }
     public function electricity_graphs(){
