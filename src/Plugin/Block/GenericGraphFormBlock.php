@@ -21,7 +21,6 @@ class GenericGraphFormBlock extends BlockBase {
      * {@inheritdoc}
      */
     public function build(){
-        //return \Drupal::formBuilder()->getForm('Drupal\pps_energy_tracker\Form\GenericGraphForm');
-        return array('#markup' =>'<p>Hello World FOO</p>');
+        return \Drupal::formBuilder()->getForm('Drupal\pps_energy_tracker\src\Form\GenericGraphForm');
     }
 }
