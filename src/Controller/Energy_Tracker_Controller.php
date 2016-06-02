@@ -14,14 +14,13 @@ use Drupal\block_content\Entity\BlockContent;
 
 class Energy_Tracker_Controller extends ControllerBase {
 
-    //TODO: Remove test variable once everything is correctly mapped
     public function content(){
         return array(
             '#theme' => 'pps_energy_tracker',
-            '#test_var' => $this->t('Test Var 1'),
         );
     }
 
+    //TODO: Update documentation
     /**
      * Generic Charts Controller function
      * Called on page load.
@@ -31,13 +30,12 @@ class Energy_Tracker_Controller extends ControllerBase {
      */
     public function generic_graphs(){
         $generic_controller = new Generic_Charts_Controller;
-        //TODO: Remove this code once the block can be pragmatically called
-        //$block = \Drupal::entityManager()->getStorage('block_content')->load($block_id);
-        //$block_view = \Drupal::entityManager()->getViewBuilder('block_content')->view($block);
 
         $block_id = ('generic_graph_form_block');
         $custom_block = \Drupal::service('plugin.manager.block')->createInstance($block_id, []);
         $block_content = $custom_block->build();
+
+        //TODO:Move this to the on submit for the form on the page.
         $pricing_data = $generic_controller->pricingController('2018', 'On Peak');
 
         return array(
@@ -48,19 +46,16 @@ class Energy_Tracker_Controller extends ControllerBase {
     public function electricity_graphs(){
         return array(
             '#theme' => 'pps_energy_tracker_electricity_graphs',
-            '#test_var' => $this->t('Test Var 1'),
         );
     }
     public function natural_gas_graphs(){
         return array(
             '#theme' => 'pps_energy_tracker_natural_gas_graphs',
-            '#test_var' => $this->t('Test Var 1'),
         );
     }
     public function account_management(){
         return array(
             '#theme' => 'pps_energy_tracker_account_management',
-            '#test_var' => $this->t('Test Var 1'),
         );
     }
 }
