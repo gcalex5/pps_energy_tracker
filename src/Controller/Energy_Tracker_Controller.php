@@ -29,15 +29,9 @@ class Energy_Tracker_Controller extends ControllerBase {
      * @return array
      */
     public function generic_graphs(){
-        $generic_controller = new Generic_Charts_Controller;
-
         $block_id = ('generic_graph_form_block');
         $custom_block = \Drupal::service('plugin.manager.block')->createInstance($block_id, []);
         $block_content = $custom_block->build();
-
-        //TODO:Move this to the on submit for the form on the page.
-        $pricing_data = $generic_controller->pricingController('2018', 'On Peak');
-
         return array(
             '#theme' => 'pps_energy_tracker_generic_graphs',
             '#element_content' => $block_content,

@@ -137,9 +137,10 @@ class Generic_Charts_Controller {
         $zero_counter = 0;
         $monthly_off_total = 0;
         $this->PRICING_START->add(new \DateInterval('P1D'));
+        //TODO: Cast into $pricing_array for multiple series support
       }while($this->PRICING_START < $this->MAX_DATE);
     }
-    return $pricing_array;
+    return $temp_array;
   }
 
   /**
