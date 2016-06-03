@@ -34,9 +34,10 @@ function pps_energy_tracker_theme($existing, $type, $theme, $path) {
         ),
         'pps_energy_tracker_generic_graphs' => array(
             'variables' => array(
-                'element_content' => NULL,
+              'element_content' => NULL,
+              'graph_data' => NULL,
             ),
-            'template' => 'pps_energy_tracker_generic_graphs',
+          'template' => 'pps_energy_tracker_generic_graphs',
         ),
     );
 }

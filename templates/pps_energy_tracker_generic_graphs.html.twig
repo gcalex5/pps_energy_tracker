@@ -10,6 +10,7 @@
 
 {{ attach_library('pps_energy_tracker/pps_energy_tracker_css') }}
 
+
 <div id="energy_tracker_container">
     <div id="graph_form">
         <p>Generic Form Foo BlockX</p>
@@ -17,7 +18,13 @@
         <p>Generic Post Form Foo Block</p>
     </div>
     <div class="graph-content">
-        <p>Graph Content Foo</p>
+        <p>FOO</p>
+       {# {% if graph_data %}
+            {{ graph_data|json_encode|raw }}
+            {{ attach_library('pps_energy_tracker/pps_energy_tracker_generic_graphs') }}
+
+            <div id="chartContainer" style="width: 800px; height: 380px;"></div>
+        {% endif %} #}
     </div>
 
     <a href="/energy_tracker">Back to Energy Tracker Home</a>

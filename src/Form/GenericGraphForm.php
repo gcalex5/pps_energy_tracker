@@ -72,8 +72,10 @@ class GenericGraphForm extends FormBase{
     $graph_name = $form['graph_name']['#options'][$form_state->getValue('graph_name')];
     $graph_type = $form['graph_type']['#options'][$form_state->getValue('graph_type')];
     $generic_controller = new Generic_Charts_Controller;
-    $pricing_data = $generic_controller->pricingController($graph_name, $graph_type);
-    return parent::submitForm($form, $form_state);
+    $temp_array = $generic_controller->pricingController($graph_name, $graph_type);
+    $foo = 'pause!!';
+    $_SESSION['energy_tracker']['generic_graph_data'] = $temp_array;
+    //return parent::submitForm($form, $form_state);
   }
 
   /**

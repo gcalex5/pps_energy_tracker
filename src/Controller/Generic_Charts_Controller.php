@@ -156,6 +156,7 @@ class Generic_Charts_Controller {
         //TODO: Cast into $pricing_array for multiple series support
       }while($this->PRICING_START < $this->MAX_DATE);
     }
+
     return $temp_array;
   }
 
@@ -183,9 +184,9 @@ class Generic_Charts_Controller {
   }
 
   public function septemberFix(){
-      for($i=0; $i<sizeof($this->ARRAY_DATE_KEYS); $i++){
-          $this->ARRAY_DATE_KEYS[$i] = str_replace('Sep', 'Sept', $this->ARRAY_DATE_KEYS[$i]);
-      }
+    for($i=0; $i<sizeof($this->ARRAY_DATE_KEYS); $i++){
+        $this->ARRAY_DATE_KEYS[$i] = str_replace('Sep', 'Sept', $this->ARRAY_DATE_KEYS[$i]);
+    }
   }
 
   public function setTerms($graph_choice, $graph_type){
@@ -224,5 +225,7 @@ class Generic_Charts_Controller {
     //Set the pricing start -> This was hardcoded in the Java web app version
     $this->PRICING_START = new \DateTime('2013-03-01');
     $this->CHART_TYPE = $graph_type;
+    return 'FOO';
   }
+
 }

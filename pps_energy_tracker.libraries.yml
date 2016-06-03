@@ -1,5 +1,12 @@
 pps_energy_tracker_css:
-  version: VERSION
+  version: 1.x.x
   css:
     base:
       css/style.css: {}
+
+pps_energy_tracker_generic_graph:
+  version: 1.x.x
+  js:
+    base:
+      js/canvasjs-1.8.0/canvasjs.min.js: {}
+      js/graphs/generic.js: {}

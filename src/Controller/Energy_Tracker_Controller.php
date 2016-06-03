@@ -32,9 +32,11 @@ class Energy_Tracker_Controller extends ControllerBase {
         $block_id = ('generic_graph_form_block');
         $custom_block = \Drupal::service('plugin.manager.block')->createInstance($block_id, []);
         $block_content = $custom_block->build();
+        $foo = 'pause';
         return array(
-            '#theme' => 'pps_energy_tracker_generic_graphs',
-            '#element_content' => $block_content,
+          '#theme' => 'pps_energy_tracker_generic_graphs',
+          '#element_content' => $block_content,
+          '#graph_data' => $_SESSION['energy_tracker']['generic_graph_data'][0],
         );
     }
     public function electricity_graphs(){
