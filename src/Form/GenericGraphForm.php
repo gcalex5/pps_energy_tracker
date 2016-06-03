@@ -47,7 +47,7 @@ class GenericGraphForm extends FormBase{
       '#suffix' => '</div>',
       '#description' => $this->t('Select A Graph Type'),
      // '#options' => $this->ajax_graph_type_options($selected),
-      '#options' => ['A', 'B', 'C', 'D'],
+      '#options' => ['On Peak', 'Off Peak', 'Mixed'],
     );
 
 
@@ -92,6 +92,7 @@ class GenericGraphForm extends FormBase{
    * @return array
    */
   public function ajax_graph_type_options($selected){
-    return ['A', 'B', 'C', 'D', 'E'];
+    //TODO: Rewrite this to return the valid options based off of the Graph Choice
+    return ['On Peak', 'Off Peak', 'Mixed'];
   }
 }
