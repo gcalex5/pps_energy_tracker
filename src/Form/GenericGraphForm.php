@@ -33,10 +33,10 @@ class GenericGraphForm extends FormBase{
       '#title' => 'Graph: ',
       '#options' => ['2015', '2016', '2017', '2018', '2015, 2016, 2017', '2016, 2017, 2018'],
       '#description' => $this->t('Select A Graph'),
-      /**'#ajax' => array(
-          'callback' => '$this->ajax_call_graph_type(&$form, $form_state)',
-          'wrapper' => 'graph-select-wrapper',
-      ),**/
+      //'#ajax' => array(
+      //    'callback' => '$this->ajax_call_graph_type(&$form, $form_state)',
+      //    'wrapper' => 'graph-select-wrapper',
+      //),
     );
 
     //TODO: Have this be responsive to the graph_name select
@@ -45,8 +45,8 @@ class GenericGraphForm extends FormBase{
       '#title' => $selected . ' Graph Types',
       '#prefix' => '<div id="graph-type-wrapper">',
       '#suffix' => '</div>',
-      '#description' => $this->t('Select A Graph Type'),
-     // '#options' => $this->ajax_graph_type_options($selected),
+      //'#description' => $this->t('Select A Graph Type'),
+      //'#options' => $this->ajax_graph_type_options($selected),
       '#options' => ['On Peak', 'Off Peak', 'Mixed'],
     );
 
@@ -72,10 +72,7 @@ class GenericGraphForm extends FormBase{
     $graph_name = $form['graph_name']['#options'][$form_state->getValue('graph_name')];
     $graph_type = $form['graph_type']['#options'][$form_state->getValue('graph_type')];
     $generic_controller = new Generic_Charts_Controller;
-    $temp_array = $generic_controller->pricingController($graph_name, $graph_type);
-    $foo = 'pause!!';
-    $_SESSION['energy_tracker']['generic_graph_data'] = $temp_array;
-    //return parent::submitForm($form, $form_state);
+    $_SESSION['energy_tracker']['generic_graph_data'] = $generic_controller->pricingController($graph_name, $graph_type);
   }
 
   /**

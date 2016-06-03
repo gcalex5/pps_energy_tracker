@@ -43,7 +43,10 @@ class Generic_Charts_Controller {
     //Reset dates and calculate the price points to be graphed.
     $this->setTerms($graph_choice, $graph_type);
     $pricing = $this->pricingGeneration($pricingHolder, $graph_choice, $graph_type);
-    return $pricing;
+
+    //TODO: Add multi-series support here
+    $json_prices = $this->jsonEncode($pricing[0]);
+    return $json_prices;
   }
 
   /**
@@ -156,31 +159,8 @@ class Generic_Charts_Controller {
         //TODO: Cast into $pricing_array for multiple series support
       }while($this->PRICING_START < $this->MAX_DATE);
     }
-
+    unset($temp_array[0][0]);
     return $temp_array;
-  }
-
-  /**
-   * Utility Function tests the start date to see if it will need moved.
-   * Move Scenario: Current start date has no meaningful data
-   *
-   * Calls moveStartDate if a 'Move Scenario' is met
-   *
-   * @param $current_start - the date that we are looking to start pricing.
-   */
-  public function testStartData($current_start){
-    //TODO: Do we really need this function?
-  }
-
-  /**
-   * Utility function called from testStartDate slides the current start date forward by a day
-   *
-   * Calls back to testStartDate with the moved date
-   *
-   * @param $current_start - current starting date passed from testStartDate
-   */
-  public function moveStartDate($current_start){
-    //TODO: Do we really need this function?
   }
 
   public function septemberFix(){
@@ -226,6 +206,22 @@ class Generic_Charts_Controller {
     $this->PRICING_START = new \DateTime('2013-03-01');
     $this->CHART_TYPE = $graph_type;
     return 'FOO';
+  }
+
+  /**
+   * Encode the 2D Array into a valid JSON result
+   *
+   * @param $temp_array - passed in multi-dimensional price array Dates/Prices
+   * @return array - passed back out array of json encoded Dates/Prices
+   */
+  //TODO: Add multi-series support here
+  public function jsonEncode($temp_array){
+    /**$json_array = array();
+
+    foreach($temp_array as $row){
+      $json_array[] = json_encode($row);
+    }**/
+    return json_encode($temp_array);
   }
 
 }

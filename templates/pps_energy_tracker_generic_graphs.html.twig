@@ -7,10 +7,7 @@
 
   @see 'template_preprocess_pps_energy_tracker_css()'
 #}
-
 {{ attach_library('pps_energy_tracker/pps_energy_tracker_css') }}
-
-
 <div id="energy_tracker_container">
     <div id="graph_form">
         <p>Generic Form Foo BlockX</p>
@@ -18,13 +15,45 @@
         <p>Generic Post Form Foo Block</p>
     </div>
     <div class="graph-content">
-        <p>FOO</p>
-       {# {% if graph_data %}
-            {{ graph_data|json_encode|raw }}
-            {{ attach_library('pps_energy_tracker/pps_energy_tracker_generic_graphs') }}
+       {% if graph_data %}
+           {{ attach_library('pps_energy_tracker/pps_energy_tracker_generic_graph') }}
+           <script>
+               var dps = [];   //dataPoints.
+
+
+               var fooB = {{ graph_data|json_encode|raw }};
+               var parsed = JSON.parse(fooB);
+               window.onload = function () {
+                   //Parsed "2013-03-01"[0.0478175],
+                   for(var key in parsed)
+                       dps.push({x: new Date(key), y: parsed[key][0]});
+
+                   var chart = new CanvasJS.Chart("chartContainer",
+                    {
+                       title:{
+                           text: "PJM West" + " XXXX " + "Pricing"
+                       },
+                       axisX: {
+                           valueFormatString: "MMM",
+                           interval:1,
+                           intervalType: "month"
+                       },
+                       axisY:{
+                           includeZero: false
+                       },
+                       data: [
+                        {
+                           type: "line",
+                           dataPoints: dps
+                        }
+                        ]
+                    });
+                chart.render();
+               }
+           </script>
 
             <div id="chartContainer" style="width: 800px; height: 380px;"></div>
-        {% endif %} #}
+        {% endif %}
     </div>
 
     <a href="/energy_tracker">Back to Energy Tracker Home</a>
