@@ -1,5 +1,8 @@
 <?php
 /**
+ * Primary Controller for the module. Handles creating all of the render arrays and calling to the appropriate functions based on
+ * what the user requests.
+ *
  * Created by PhpStorm.
  * User: alexm
  * Date: 5/25/2016
@@ -7,18 +10,17 @@
  * Comment for init dev branch
  */
 
-//TODO: refactor this directory to lowercase. Changes will need to be made in the routing and PHP file unless we are refactoring all packages to uppercase.
 namespace Drupal\pps_energy_tracker\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\block_content\Entity\BlockContent;
 
 class Energy_Tracker_Controller extends ControllerBase {
 
-    public function content(){
-        return array(
-            '#theme' => 'pps_energy_tracker',
-        );
-    }
+	public function content(){
+		return array(
+				'#theme' => 'pps_energy_tracker',
+		);
+	}
 
     //TODO: Update documentation
     /**
@@ -29,29 +31,29 @@ class Energy_Tracker_Controller extends ControllerBase {
      * @return array
      */
     public function generic_graphs(){
-        $block_id = ('generic_graph_form_block');
-        $custom_block = \Drupal::service('plugin.manager.block')->createInstance($block_id, []);
-        $block_content = $custom_block->build();
-        $foo = 0 + 1;
-        return array(
-          '#theme' => 'pps_energy_tracker_generic_graphs',
-          '#element_content' => $block_content,
-          '#graph_data' => $_SESSION['energy_tracker']['generic_graph_data'],
-        );
+      $block_id = ('generic_graph_form_block');
+      $custom_block = \Drupal::service('plugin.manager.block')->createInstance($block_id, []);
+      $block_content = $custom_block->build();
+      $foo = 0 + 1;
+      return array(
+        '#theme' => 'pps_energy_tracker_generic_graphs',
+        '#element_content' => $block_content,
+        '#graph_data' => $_SESSION['energy_tracker']['generic_graph_data'],
+      );
     }
     public function electricity_graphs(){
-        return array(
-            '#theme' => 'pps_energy_tracker_electricity_graphs',
-        );
+      return array(
+          '#theme' => 'pps_energy_tracker_electricity_graphs',
+      );
     }
     public function natural_gas_graphs(){
-        return array(
-            '#theme' => 'pps_energy_tracker_natural_gas_graphs',
-        );
+      return array(
+          '#theme' => 'pps_energy_tracker_natural_gas_graphs',
+      );
     }
     public function account_management(){
-        return array(
-            '#theme' => 'pps_energy_tracker_account_management',
-        );
+      return array(
+          '#theme' => 'pps_energy_tracker_account_management',
+      );
     }
 }

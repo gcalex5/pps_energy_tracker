@@ -2,9 +2,6 @@
   @file
   Default theme implementation
 
-  Available variables:
-  //TODO: Wire frame generic graphs page
-
   @see 'template_preprocess_pps_energy_tracker_css()'
 #}
 {{ attach_library('pps_energy_tracker/pps_energy_tracker_css') }}
@@ -18,15 +15,13 @@
        {% if graph_data %}
            {{ attach_library('pps_energy_tracker/pps_energy_tracker_generic_graph') }}
            <script>
-               var dps = [];   //dataPoints.
-
-
-               var fooB = {{ graph_data|json_encode|raw }};
-               var parsed = JSON.parse(fooB);
+               var dataPoints = [];
+               var passedFromController = {{ graph_data|json_encode|raw }};
+               //passedFromController Format -> "2013-03-01"[0.0478175]
+               var parsed = JSON.parse(passedFromController);
                window.onload = function () {
-                   //Parsed "2013-03-01"[0.0478175],
                    for(var key in parsed)
-                       dps.push({x: new Date(key), y: parsed[key][0]});
+                       dataPoints.push({x: new Date(key), y: parsed[key][0]});
 
                    var chart = new CanvasJS.Chart("chartContainer",
                     {
@@ -51,10 +46,8 @@
                 chart.render();
                }
            </script>
-
             <div id="chartContainer" style="width: 800px; height: 380px;"></div>
         {% endif %}
     </div>
-
     <a href="/energy_tracker">Back to Energy Tracker Home</a>
 </div>

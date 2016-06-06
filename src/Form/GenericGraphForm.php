@@ -1,5 +1,7 @@
 <?php
 /**
+ * Form Handler, handles building, submission, and validation of the form on the /energy_tracker/generic_graph page
+ *
  * Created by PhpStorm.
  * User: alexm
  * Date: 6/1/2016
@@ -8,7 +10,6 @@
 
 namespace Drupal\pps_energy_tracker\Form;
 
-//TODO: Document entire class
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\pps_energy_tracker\Controller\Generic_Charts_Controller;
@@ -26,6 +27,7 @@ class GenericGraphForm extends FormBase{
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state){
+
     //TODO: Switch selected to be a dynamic variable
     $selected = 'This is default selected';
     $form['graph_name'] = array(
@@ -77,6 +79,7 @@ class GenericGraphForm extends FormBase{
 
   /**
    * AJAX call to redraw the Graph Type select box with new options
+   *
    * @param array $form
    * @param FormStateInterface $form_state
    * @return mixed
@@ -87,6 +90,7 @@ class GenericGraphForm extends FormBase{
 
   /**
    * AJAX call to populate the Graph Type select box
+   *
    * @param $selected
    * @return array
    */

@@ -1,6 +1,9 @@
 <?php
-//TODO: Add proper documentation here
 /**
+ * Generic_Charts_Controller grabs the input being passed from the GenericGraphForm and then for each series being requested
+ * We generate an array of dates and prices that is then passed back to the Energy_Tracker_Controller to be passed into the render array
+ * So that the chart library can draw the appropriate graph
+ *
  * Created by PhpStorm.
  * User: Alex
  * Date: 5/30/2016
@@ -12,7 +15,6 @@ use Drupal\Core\Render\Element\Date;
 use Symfony\Component\Validator\Constraints\DateTime;
 
 class Generic_Charts_Controller {
-  //TODO: Should these really initially by null?
   public $ON_PEAK_PRICES = array(array()); //On Peak Pricing Data
   public $OFF_PEAK_PRICES = array(array()); //Off Peak Pricing Data
   public $CHART_TYPE = 'NULL'; //Default Chart Type = ON PEAK
@@ -23,15 +25,13 @@ class Generic_Charts_Controller {
   public $ARRAY_DATE_KEYS = array(); //Need to change to 2D Array to handle multiple series
   public $MONTHLY_USAGE = 100000; //Declaration of the standard Monthly Usage as 100,000 kWh
   /**
-   * ->Entry Point Of Class<-
-   * Makes the initial function call to start calculating the pricing data.
+   * Calls the functions in proper order to generate the [series][dates][prices] for the view
    *
    * @param $graph_choice - graph that needs to be queried Years 2015/2016/2017/2018/etc.
    * @param $graph_type - the type of graph that needs drawn On/Off/Mixed
    * @return string - return the pricing array
    */
   public function pricingController($graph_choice, $graph_type){
-      //TODO: Set all constants before we move forward need to be moved into dynamic user input
 
     //set all of the date and graph type constants
     $this->setTerms($graph_choice, $graph_type);
@@ -44,7 +44,7 @@ class Generic_Charts_Controller {
     $this->setTerms($graph_choice, $graph_type);
     $pricing = $this->pricingGeneration($pricingHolder, $graph_choice, $graph_type);
 
-    //TODO: Add multi-series support here
+    //JSON Encode the data for it to be passed to the view
     $json_prices = $this->jsonEncode($pricing[0]);
     return $json_prices;
   }
@@ -60,7 +60,7 @@ class Generic_Charts_Controller {
     //TODO: Change to 2D Array to handle multiple series
     $temp_array = array();
 
-    //TODO: Turn this into a For Loop with a Do/While inside of it for multiple series
+    //TODO: Add a for loop here to handle multiple series
     $query = 'Select purchase_date, ';
     do{
       $query = $query . $this->TERM_START->format('M_y, ');
@@ -77,7 +77,7 @@ class Generic_Charts_Controller {
     //Reset dates
     $this->setTerms($graph_choice, $graph_type);
 
-    //Grab only the appropriate data
+    //Grab only the data we need
     if($graph_type == 'On Peak'){
       $query.= "FROM ppsweb_pricemodel.elec_on_peak WHERE purchase_date >= '". $this->PRICING_START->format('Y-m-d') . "' ORDER BY purchase_date";
       $temp_array[0] = db_query($query)->fetchAllAssoc('purchase_date');
@@ -107,40 +107,41 @@ class Generic_Charts_Controller {
    * @param $graph_type - Type of graph -> 'On Peak', 'Off Peak', 'Mixed'
    * @return string - placeholder return documentation
    */
-  //TODO: Add an argument to let this function know how many series we need to generate
   public function pricingGeneration($data_array, $graph_choice, $graph_type){
     $temp_array = array(array(array()));
     $monthly_on_total = 0;
     $monthly_off_total = 0;
 
+    //TODO: Once a multi-series argument is passed change the '1' to a variable
     //Run the loop one to three times depending upon the request
-    //TODO: Add multiple series support
     for($i=0; $i<1; $i++){
       $zero_counter = 0;
       $current_keys = array_keys($data_array[$i]);
       $this->MAX_DATE = new \DateTime($current_keys[sizeof($current_keys) - 3]);
+
       //do/while loop runs from PRICING_START until MAX_DATE incrementing one day at a time
       do{
-        //On or Off Peak Pricing
         $current_day_formatted = $this->PRICING_START->format('Y-m-d');
+        //Currently only setup to handle On or Off Peak pricing
+        //TODO: Change this if statement to look at the graph_choice/graph_type variables so we can handle mixed pricing
         if(isset($data_array[$i][$current_day_formatted])){
           for($j=0; $j<12; $j++){
             $current_date_key = $this->ARRAY_DATE_KEYS[$j];
             $current_price = $data_array[$i][$current_day_formatted]->$current_date_key;
-            //Zero Counter is probably not necessary here.
             if($current_price > 0.0001){
+              //Calculate the price point for [Series->current_day_formatted->Month_Year] then add it to our running total
               $monthly_on_total += (($current_price / 1000) * $this->MONTHLY_USAGE);
             }
             else{
+              //Keep track of any 0's being returned from database
               $zero_counter++;
             }
           }
         }
-        //TODO: Mixed Pricing
+        //TODO: Handle mixed On/Off Peak Pricing
 
         /**
          * Calculate the price for today and add it to the pricing list
-         *
          * Price = (Term Cost / (Term Vol - (Num Zeroes * 100K ))
          */
         if($monthly_on_total > 0.00001 && $zero_counter < 12){
@@ -149,17 +150,21 @@ class Generic_Charts_Controller {
           $temp_array[$i][$this->PRICING_START->format('Y-m-d')][] = $price;
         }
         else{
-          //We have 12 0's nothing is necessary
+          //We have 12 0's for our prices, signifying that no pricing has been found for today
+          //So we are going to just skip today and move on.
         }
-        //Flush variables
+
+        //Flush variables for the next day of pricing
         $monthly_on_total = 0;
         $monthly_off_total = 0;
         $zero_counter = 0;
         $this->PRICING_START->add(new \DateInterval('P1D'));
-        //TODO: Cast into $pricing_array for multiple series support
       }while($this->PRICING_START < $this->MAX_DATE);
     }
+
+    //Always seem to have an empty first record so lets unset that
     unset($temp_array[0][0]);
+
     return $temp_array;
   }
 
