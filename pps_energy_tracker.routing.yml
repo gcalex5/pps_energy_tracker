@@ -1,7 +1,7 @@
 pps_energy_tracker.content:
   path: '/energy_tracker'
   defaults:
-    _controller: 'Drupal\pps_energy_tracker\Controller\Energy_Tracker_Controller::content'
+    _controller: 'Drupal\pps_energy_tracker\Controller\EnergyTrackerController::content'
     _title: 'PPS Energy Tracker - Home'
   requirements:
     _permission: 'access content'
@@ -9,7 +9,7 @@ pps_energy_tracker.content:
 pps_energy_tracker.generic_graphs:
   path: '/energy_tracker/generic_graphs'
   defaults:
-    _controller: 'Drupal\pps_energy_tracker\Controller\Energy_Tracker_Controller::generic_graphs'
+    _controller: 'Drupal\pps_energy_tracker\Controller\EnergyTrackerController::generic_graphs'
     _title: 'PPS Energy Tracker - Generic Graphs'
   requirements:
     _permission: 'access content'
@@ -17,7 +17,7 @@ pps_energy_tracker.generic_graphs:
 pps_energy_tracker.electricity_graphs:
   path: '/energy_tracker/electricity_graphs'
   defaults:
-    _controller: 'Drupal\pps_energy_tracker\Controller\Energy_Tracker_Controller::electricity_graphs'
+    _controller: 'Drupal\pps_energy_tracker\Controller\EnergyTrackerController::electricity_graphs'
     _title: 'PPS Energy Tracker - Electricity Graphs'
   requirements:
     _permission: 'access content'
@@ -25,7 +25,7 @@ pps_energy_tracker.electricity_graphs:
 pps_energy_tracker.natural_gas_graphs:
   path: '/energy_tracker/natural_gas_graphs'
   defaults:
-    _controller: 'Drupal\pps_energy_tracker\Controller\Energy_Tracker_Controller::natural_gas_graphs'
+    _controller: 'Drupal\pps_energy_tracker\Controller\EnergyTrackerController::natural_gas_graphs'
     _title: 'PPS Energy Tracker - Natural Gas Graphs'
   requirements:
     _permission: 'access content'
@@ -33,7 +33,7 @@ pps_energy_tracker.natural_gas_graphs:
 pps_energy_tracker.account_management:
   path: '/energy_tracker/account_management'
   defaults:
-    _controller: 'Drupal\pps_energy_tracker\Controller\Energy_Tracker_Controller::account_management'
+    _controller: 'Drupal\pps_energy_tracker\Controller\EnergyTrackerController::account_management'
     _title: 'PPS Energy Tracker - Account Management'
   requirements:
     _permission: 'access content'

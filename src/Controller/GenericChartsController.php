@@ -11,10 +11,8 @@
  */
 
 namespace Drupal\pps_energy_tracker\Controller;
-use Drupal\Core\Render\Element\Date;
-use Symfony\Component\Validator\Constraints\DateTime;
 
-class Generic_Charts_Controller {
+class GenericChartsController {
   public $ON_PEAK_PRICES = array(array()); //On Peak Pricing Data
   public $OFF_PEAK_PRICES = array(array()); //Off Peak Pricing Data
   public $CHART_TYPE = 'NULL'; //Default Chart Type = ON PEAK
@@ -32,7 +30,6 @@ class Generic_Charts_Controller {
    * @return string - return the pricing array
    */
   public function pricingController($graph_choice, $graph_type){
-
     //set all of the date and graph type constants
     $this->setTerms($graph_choice, $graph_type);
 
@@ -82,12 +79,10 @@ class Generic_Charts_Controller {
       $query.= "FROM ppsweb_pricemodel.elec_on_peak WHERE purchase_date >= '". $this->PRICING_START->format('Y-m-d') . "' ORDER BY purchase_date";
       $temp_array[0] = db_query($query)->fetchAllAssoc('purchase_date');
     }
-
     else if($graph_type == 'Off Peak'){
       $query.= "FROM ppsweb_pricemodel.elec_off_peak WHERE purchase_date >= '". $this->PRICING_START->format('Y-m-d') . "' ORDER BY purchase_date";
       $temp_array[0] = db_query($query)->fetchAllAssoc('purchase_date');
     }
-
     else{
       $query.= "FROM ppsweb_pricemodel.elec_on_peak WHERE purchase_date >= '". $this->PRICING_START->format('Y-m-d') . "' ORDER BY purchase_date";
       $temp_array[0] = db_query($query)->fetchAllAssoc('purchase_date');
@@ -138,22 +133,24 @@ class Generic_Charts_Controller {
             }
           }
         }
+
         //TODO: Handle mixed On/Off Peak Pricing
 
-        /**
-         * Calculate the price for today and add it to the pricing list
-         * Price = (Term Cost / (Term Vol - (Num Zeroes * 100K ))
-         */
         if($monthly_on_total > 0.00001 && $zero_counter < 12){
+          /**
+           * Calculate the price for today and add it to the pricing list
+           * Price = (Term Cost / (Term Vol - (Num Zeroes * 100K ))
+           */
           $price = ($monthly_on_total + $monthly_off_total) / (($this->MONTHLY_USAGE * 12) - ($zero_counter * $this->MONTHLY_USAGE));
-          //$temp_array[For Loop(Series#)[Date][Price]
+          //Array setup -> $temp_array[For Loop(Series#)[Date][Price]
           $temp_array[$i][$this->PRICING_START->format('Y-m-d')][] = $price;
         }
         else{
-          //We have 12 0's for our prices, signifying that no pricing has been found for today
-          //So we are going to just skip today and move on.
+          /**
+           * We have 12 0's for our prices, signifying that no pricing has been found for today
+           * So we are going to just skip today and move on.
+           */
         }
-
         //Flush variables for the next day of pricing
         $monthly_on_total = 0;
         $monthly_off_total = 0;
@@ -168,12 +165,21 @@ class Generic_Charts_Controller {
     return $temp_array;
   }
 
+  /**
+   * Replace september's abbreviation to match data model
+   */
   public function septemberFix(){
     for($i=0; $i<sizeof($this->ARRAY_DATE_KEYS); $i++){
         $this->ARRAY_DATE_KEYS[$i] = str_replace('Sep', 'Sept', $this->ARRAY_DATE_KEYS[$i]);
     }
   }
 
+  /**
+   * Reset the date constants
+   *
+   * @param $graph_choice - graph name ex: '2015', '2016', etc
+   * @param $graph_type - On/Off Peak, Mixed
+   */
   public function setTerms($graph_choice, $graph_type){
     /**
      * Graph Choice can be: 2015, 2016, 2017, 2018, 2019, (2015, 2016, 2017), (2016, 2017, 2018)
@@ -210,7 +216,6 @@ class Generic_Charts_Controller {
     //Set the pricing start -> This was hardcoded in the Java web app version
     $this->PRICING_START = new \DateTime('2013-03-01');
     $this->CHART_TYPE = $graph_type;
-    return 'FOO';
   }
 
   /**

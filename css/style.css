@@ -1,0 +1,12 @@
+.account-form{
+
+}
+
+.account-fields{
+    float:left;
+}
+
+.usage-fields, .peak-fields{
+    float:left;
+    margin-left:2em;
+}

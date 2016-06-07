@@ -4,11 +4,7 @@
  */
 namespace Drupal\pps_energy_tracker\Plugin\Block;
 
-//TODO: Test without AccessResult, FormStateInterface, and AccountInterface includes
-use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockBase;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Session\AccountInterface;
 
 /**
  * Generic Graph Form Block for PPS ET
@@ -22,6 +18,7 @@ class GenericGraphFormBlock extends BlockBase {
 
   /**
    * {@inheritdoc}
+   * @return array - GenericGraphForm
    */
   public function build(){
       return \Drupal::formBuilder()->getForm('Drupal\pps_energy_tracker\Form\GenericGraphForm');
