@@ -25,9 +25,7 @@ class AccountManagementForm extends FormBase{
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state){
-    /**
-     * Personal Info
-     */
+    //Personal Information
     $form['bus_name'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Business Name'),
@@ -36,20 +34,21 @@ class AccountManagementForm extends FormBase{
       '#prefix' => "<div class='account-fields'>",
       '#required' => TRUE,
     );
+
     //TODO: Swap this into a database call to the utility table
     $form['utility'] = array(
       '#type' => 'select',
       '#title' => $this->t('Utility Name'),
-      '#value' => ['A', 'B', 'C'],
+      '#options' => ['A', 'B', 'C'],
       '#required' => TRUE,
     );
+
     $form['pricing_start'] = array(
-      '#type' => 'textfield',
+      '#type' => 'date',
       '#title' => $this->t('Pricing Start'),
-      '#size' => 20,
-      '#maxlength' => 128,
       '#required' => TRUE,
     );
+
     //TODO: Need to support 3 Contract Start/End's
     $form['contract_s_1'] = array(
       '#type' => 'date',
@@ -61,6 +60,7 @@ class AccountManagementForm extends FormBase{
       '#title' => $this->t('Contract End'),
       '#required' => TRUE,
     );
+
     $form['cap_obligation'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Capacity Obligation'),
@@ -84,10 +84,7 @@ class AccountManagementForm extends FormBase{
       '#required' => TRUE,
     );
 
-    /**
-     * Monthly Usage
-     * There really needs to be a better way to do this
-     */
+    //Monthly Usage
     $form['jan_usage'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Jan Usage'),
@@ -175,10 +172,8 @@ class AccountManagementForm extends FormBase{
       '#required' => TRUE,
     );
 
-    /**
-     * On/Off Peak
-     */
-    //TODO: Handle all 12 mont
+    //TODO: Handle all 12 months seperately
+    //On and Off Peak Percentages
     $form['on_peak'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('On Peak'),
@@ -214,23 +209,7 @@ class AccountManagementForm extends FormBase{
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state){
-    //TODO: Store form data in the database
-    /**
-     * Database Notes
-     * account.id = Auto-Increment
-     * account.user_id -> Does Drupal have a user id?
-     * account.usage_id -> Reference
-     * account.utility_id -> Reference
-     * account.last_date = needs set to a date as a placeholder
-     *
-     * account_usage.id = Auto-Increment
-     * INT(11)
-     * account_usage.usage_id
-     * account_usage.xxx_usage -> All 12 months
-     * account_usage.xxx_demand -> All 12 months. Not used anymore?
-     * account_usage.xxx_on_peak -> All 12 months.
-     *
-     */
+    //Pull the form data into variables
     $bus_name = $form_state->getValue('bus_name');
     $utility = $form['utility']['#options'][$form_state->getValue('utility')];
     $pricing_start = $form_state->getValue('pricing_start');
@@ -254,10 +233,31 @@ class AccountManagementForm extends FormBase{
     $on_peak = $form_state->getValue('on_peak');
     $off_peak = $form_state->getValue('off_peak');
 
-    $query = "INSERT INTO ppsweb_pricemodel.account (user_id, utility_id, usage_id, business_name, pricing_start, ".
-      "contract_start, contract_end, trarget_price, last_price, last_date) ";
-    $query .= "(0, 0, 0, " . $bus_name .", ". $pricing_start .", " . $contract_s_1 .", ". $contract_e_1 . ", ". $target_price . ", 0, ". "2016-06-25";
+    /**
+     * Store the account usage details
+     */
+    $query = "INSERT INTO ppsweb_pricemodel.account_usage (adtl_cost, cap_obligation, on_peak_percent," .
+      "off_peak_percent, jan_usage, feb_usage, mar_usage, apr_usage, may_usage, jun_usage, jul_usage, aug_usage, " .
+      "sept_usage, oct_usage, nov_usage, dec_usage) VALUES ("
+      . $adtl_cost . ", " . $cap_obligation . ", " . $on_peak . ", " . $off_peak . ", " . $jan_usage . ", " . $feb_usage
+      . ", " . $mar_usage . ", " .$apr_usage . ", " . $may_usage . ", " . $jun_usage . ", " . $jul_usage . ", " . $aug_usage
+      . ", " . $sep_usage . ", " . $oct_usage . ", " . $nov_usage . ", " . $dec_usage . ")";
+      db_query($query);
 
-    db_query($query);
+    /**
+     * Get the usage_id for what we just inserted
+     */
+    $second_query = "SELECT last_insert_id() AS id";
+    $usage_id = db_query($second_query)->fetchAll()[0]->id;
+
+    /**
+     * Store the account details
+     */
+    //TODO: Utility ID should be dynamically set with the $utility variable. Current set to 3 as a default making it 'OH - Ohio Edison'
+    $third_query = "INSERT INTO ppsweb_pricemodel.account (user_id, utility_id, usage_id, business_name, pricing_start, " .
+      "contract_start, contract_end, target_price, last_price, last_date) VALUES ("
+      . \Drupal::currentUser()->id() . ", 3," . $usage_id . ", '" . $bus_name . "', '" . $pricing_start . "', '"
+      . $contract_s_1 . "', '" . $contract_e_1 . "', " . $target_price . ", 0.025, " . "'2016-06-25')";
+    db_query($third_query);
   }
 }
