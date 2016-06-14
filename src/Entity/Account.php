@@ -50,4 +50,148 @@ class Account {
     $this->last_date_2 = $dbData->last_date_2;
     $this->last_date_3 = $dbData->last_date_3;
   }
+
+  /**
+   * @return mixed
+   */
+  public function getId()
+  {
+    return $this->id;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getUserId()
+  {
+    return $this->user_id;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getUsageId()
+  {
+    return $this->usage_id;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getBusinessName()
+  {
+    return $this->business_name;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getPricingStart()
+  {
+    return $this->pricing_start;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getContractStart()
+  {
+    return $this->contract_start;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getContractEnd()
+  {
+    return $this->contract_end;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getContractStart2()
+  {
+    return $this->contract_start_2;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getContractEnd2()
+  {
+    return $this->contract_end_2;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getContractStart3()
+  {
+    return $this->contract_start_3;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getContractEnd3()
+  {
+    return $this->contract_end_3;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getTargetPrice()
+  {
+    return $this->target_price;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getLastPrice()
+  {
+    return $this->last_price;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getLastPrice2()
+  {
+    return $this->last_price_2;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getLastPrice3()
+  {
+    return $this->last_price_3;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getLastDate()
+  {
+    return $this->last_date;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getLastDate2()
+  {
+    return $this->last_date_2;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getLastDate3()
+  {
+    return $this->last_date_3;
+  }
 }

@@ -76,5 +76,244 @@ class AccountUsage {
     $this->dec_on_peak = $dbData->dec_on_peak;
   }
 
+  /**
+   * @return mixed
+   */
+  public function getId()
+  {
+    return $this->id;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getAdtlCost()
+  {
+    return $this->adtl_cost;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getUsageId()
+  {
+    return $this->usage_id;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getCapObligation()
+  {
+    return $this->cap_obligation;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getOnPeakPercent()
+  {
+    return $this->on_peak_percent;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getOffPeakPercent()
+  {
+    return $this->off_peak_percent;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getJanUsage()
+  {
+    return $this->jan_usage;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getFebUsage()
+  {
+    return $this->feb_usage;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getMarUsage()
+  {
+    return $this->mar_usage;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getAprUsage()
+  {
+    return $this->apr_usage;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getMayUsage()
+  {
+    return $this->may_usage;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getJunUsage()
+  {
+    return $this->jun_usage;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getJulUsage()
+  {
+    return $this->jul_usage;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getAugUsage()
+  {
+    return $this->aug_usage;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getSeptUsage()
+  {
+    return $this->sept_usage;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getOctUsage()
+  {
+    return $this->oct_usage;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getNovUsage()
+  {
+    return $this->nov_usage;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getDecUsage()
+  {
+    return $this->dec_usage;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getJanOnPeak()
+  {
+    return $this->jan_on_peak;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getFebOnPeak()
+  {
+    return $this->feb_on_peak;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getMarOnPeak()
+  {
+    return $this->mar_on_peak;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getAprOnPeak()
+  {
+    return $this->apr_on_peak;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getMayOnPeak()
+  {
+    return $this->may_on_peak;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getJunOnPeak()
+  {
+    return $this->jun_on_peak;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getJulOnPeak()
+  {
+    return $this->jul_on_peak;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getAugOnPeak()
+  {
+    return $this->aug_on_peak;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getSeptOnPeak()
+  {
+    return $this->sept_on_peak;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getOctOnPeak()
+  {
+    return $this->oct_on_peak;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getNovOnPeak()
+  {
+    return $this->nov_on_peak;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getDecOnPeak()
+  {
+    return $this->dec_on_peak;
+  }
 
 }
