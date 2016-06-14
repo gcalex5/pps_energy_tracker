@@ -39,6 +39,9 @@ class EnergyTrackerController extends ControllerBase {
     );
   }
   public function electricity_graphs(){
+    //TODO:Switch to form input.
+    $foo = new ElectricityChartsController();
+    $foo->pricingController(15);
     return array(
       '#theme' => 'pps_energy_tracker_electricity_graphs',
     );

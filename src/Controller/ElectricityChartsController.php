@@ -10,6 +10,8 @@
 //TODO: documentation
 
 namespace Drupal\pps_energy_tracker\Controller;
+use Drupal\pps_energy_tracker\Entity\Account;
+use Drupal\pps_energy_tracker\Entity\AccountUsage;
 
 class ElectricityChartsController {
   public $ON_PEAK_PRICES = array(array()); //On Peak Pricing Data
@@ -22,24 +24,52 @@ class ElectricityChartsController {
   public $MAX_DATE =  null; //Last day of pricing.
 
   /**
+   * Controller class for Electricity Charts.
+   * Receives an 'account id' from the view, Calls the necessary functions, and returns an array of Dates/Prices to the view.
    *
    * @param $account_id -> account id
    * @return array -> return the price/date array
    */
-  public function pricingController( $account_id ){
-    $pricingHolder = $this->queryData($account_id);
+  public function pricingController($account_id){
+    //Pull Account Information
+    $account = $this->pullAccountData($account_id);
 
+    //Set the terms
+    $this->setTerms($account);
+
+    //Query the data
+    $pricingHolder = $this->queryData();
+
+    //Run the pricing algorithm
+
+
+    //JSON encode the data and pass back to the frontend
     return $this->jsonEncode($pricingHolder);
+  }
+
+  /**
+   * Grab the account data and pass it to the Account/Account Usage constructors
+   *
+   * @param $account_id -> The ID of the account we are working with
+   * @return array -> Return and array with the account and usage
+   */
+  public function pullAccountData($account_id){
+    $temp_account = db_query('SELECT * FROM ppsweb_pricemodel.account WHERE id=' . $account_id)->fetchAll();
+    $temp_usage = db_query('SELECT * FROM ppsweb_pricemodel.account_usage WHERE id=' . $temp_account[0]->usage_id)->fetchAll();
+
+    $account = new Account($temp_account[0]);
+    $account_usage = new AccountUsage($temp_usage[0]);
+
+    return[$account, $account_usage];
   }
 
   /**
    * Query up all of the relevant pricing data.
    *
-   * @param $account_id->the ID of the 'Account' we are working with. Not needed?
-   * @return array
+   * @return array -> Return array holding all of the queried data KEYS:[0]->Off Peak [1]->On Peak [2]->Capacity [3]->Dates
    */
   //TODO: Have this handle multiple series
-  public function queryData( $account_id ){
+  public function queryData(){
     $temp_array = array();
     $offPeakQuery = "SELECT purchase_date, ";
 
@@ -81,6 +111,7 @@ class ElectricityChartsController {
     $off_peak = array();
 
     //Calculate on and off peak volumes per month over the course of the contract
+    //TODO: Move this into its own function
     do{
       //On Peak Volume -> MMM_Usage * (MMM_On_Peak/100)
       //Off Peak Volume -> MMM_Usage - MMM_On Peak Volume
@@ -111,19 +142,16 @@ class ElectricityChartsController {
       $this->PRICING_START->add(new \DateInterval('P1D'));
     }while($this->PRICING_START < $this->MAX_DATE);
 
-
-
-
-
     return $temp_array;
   }
 
   /**
+   * Set/Reset the term variables
    *
-   *
+   * @param $account array containing the account/account usage objects Array Keys: [0]->Account [1]->Account Usage
    */
-  public function setTerms(){
-
+  public function setTerms($account){
+    
   }
 
   /**
