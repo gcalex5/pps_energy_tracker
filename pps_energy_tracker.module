@@ -23,7 +23,9 @@ function pps_energy_tracker_theme($existing, $type, $theme, $path) {
       'template' => 'pps_energy_tracker_account_management',
     ),
     'pps_energy_tracker_electricity_graphs' => array(
-      'variables' => array(),
+      'variables' => array(
+        'graph_data' => NULL,
+      ),
       'template' => 'pps_energy_tracker_electricity_graphs',
     ),
     'pps_energy_tracker_natural_gas_graphs' => array(

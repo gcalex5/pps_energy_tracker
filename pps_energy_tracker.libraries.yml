@@ -4,8 +4,7 @@ pps_energy_tracker_css:
     base:
       css/style.css: {}
 
-pps_energy_tracker_generic_graph:
+pps_energy_tracker_graph:
   version: 1.x.x
   js:
     js/canvasjs-1.8.0/canvasjs.min.js: {}
-    js/graphs/generic.js: {}
