@@ -10,4 +10,42 @@
 <div>
     <p>Hello World: Energy Tracker - Electricity Graphs</p>
     <a href="/energy_tracker">Back to Energy Tracker Home</a>
+    <div class="graph-content">
+        {% if graph_data %}
+            {{ attach_library('pps_energy_tracker/pps_energy_tracker_graph') }}
+            <script>
+                var dataPoints = [];
+                var passedFromController = {{ graph_data|json_encode|raw }};
+                //EX: passedFromController Format -> "2013-03-01"[0.0478175]
+                var parsed = JSON.parse(passedFromController);
+                window.onload = function () {
+                    for(var key in parsed)
+                        dataPoints.push({x: new Date(key), y: parsed[key][0]});
+
+                    var chart = new CanvasJS.Chart("chartContainer",
+                            {
+                                title:{
+                                    text: "ACCOUNT NUMBER/NAME" + " Pricing"
+                                },
+                                axisX: {
+                                    valueFormatString: "MMM",
+                                    interval:1,
+                                    intervalType: "month"
+                                },
+                                axisY:{
+                                    includeZero: false
+                                },
+                                data: [
+                                    {
+                                        type: "line",
+                                        dataPoints: dataPoints
+                                    }
+                                ]
+                            });
+                    chart.render();
+                }
+            </script>
+            <div id="chartContainer" style="width: 800px; height: 380px;"></div>
+        {% endif %}
+    </div>
 </div>

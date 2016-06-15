@@ -41,9 +41,11 @@ class EnergyTrackerController extends ControllerBase {
   public function electricity_graphs(){
     //TODO:Switch to form input.
     $foo = new ElectricityChartsController();
-    $foo->pricingController(15);
+    $electricity_graph_data = $foo->pricingController(15);
+    $foo = 1 + 1;
     return array(
       '#theme' => 'pps_energy_tracker_electricity_graphs',
+      '#graph_data' => $electricity_graph_data,
     );
   }
   public function natural_gas_graphs(){

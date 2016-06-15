@@ -14,7 +14,6 @@ namespace Drupal\pps_energy_tracker\Controller;
 
 use Drupal\pps_energy_tracker\Entity\Account;
 use Drupal\pps_energy_tracker\Entity\AccountUsage;
-use Symfony\Component\Validator\Constraints\DateTime;
 
 class ElectricityChartsController {
   public $ON_PEAK_PRICES = array(array()); //On Peak Pricing Data
@@ -50,10 +49,10 @@ class ElectricityChartsController {
     $peaks = $this->calculatePeakNumbers($account);
 
     //Run the pricing algorithm
-    $this->pricingGeneration($pricingHolder, $account, $peaks);
+    $output = $this->jsonEncode($this->pricingGeneration($pricingHolder, $account, $peaks));
 
     //JSON encode the data and pass back to the frontend
-    return $this->jsonEncode($pricingHolder);
+    return $output;
   }
 
   /**
@@ -182,15 +181,16 @@ class ElectricityChartsController {
       $totalOn=0;
       $totalOff=0;
       $totalCap=0;
+      $empty = false;
+      $arrayFormat = $this->PRICING_START->format('Y-m-d');
       //Prep Capacity by converting to an associative array
       //TODO:Re-Evaluate this usage, I don't think it should be necessary
       $capArray = json_decode(json_encode($dataArray[2]), true);
 
       do{
-        //Format string into our array key format
+        //Format strings into our array key format
         $monthString = $this->TERM_START->format('M');
         $capFormat = $this->TERM_START->format('M_y');
-        $arrayFormat = $this->PRICING_START->format('Y-m-d');
 
         //September exception
         if($monthString == 'Sep'){
@@ -198,19 +198,27 @@ class ElectricityChartsController {
           $capFormat = str_replace('Sep', 'Sept', $capFormat);
         }
 
-        //Total On/Off Peak Numbers
-        //TODO: Check for undefined index and break
-        $totalOn += ($dataArray[0][$arrayFormat]->$capFormat / 1000) * $peakNumbers[0][$monthString];
-        $totalOff += ($dataArray[1][$arrayFormat]->$capFormat / 1000) * $peakNumbers[1][$monthString];
-        $totalCap += $capArray[''][$capFormat];
+        //Total On/Off Peak Numbers as well as Capacity
+        if($dataArray[0][$arrayFormat]->$capFormat != null){
+          $totalOn += ($dataArray[0][$arrayFormat]->$capFormat / 1000) * $peakNumbers[0][$monthString];
+          $totalOff += ($dataArray[1][$arrayFormat]->$capFormat / 1000) * $peakNumbers[1][$monthString];
+          $totalCap += $capArray[''][$capFormat];
+        }
+        //no data found in the arrays for today break and head to the next day
+        else{
+          $empty=true;
+          break;
+        }
 
         //Increment by one month
         $this->TERM_START->add(new \DateInterval('P1M'));
       }while($this->TERM_START < $this->TERM_END);
 
-      //Calculate today's price and store in the array to return
-      $price = ($totalOn + $totalOff + $totalCap + ($account[1]->getAdtlCost() * $term_vol)) / $term_vol;
-      $temp_array[$this->PRICING_START->format('Y-M-d')][] = $price;
+      //if we have data toss it into the array. otherwise continue on
+      if($empty == false){
+        $price = ($totalOn + $totalOff + $totalCap + ($account[1]->getAdtlCost() * $term_vol)) / $term_vol;
+        $temp_array[$this->PRICING_START->format('Y-m-d')][] = $price;
+      }
 
       //reset TERM Variables and move to the next day
       $this->setTerms($account, true);
@@ -236,10 +244,10 @@ class ElectricityChartsController {
   }
 
   /**
+   * JSON encode the pricing array and pass it back to the view
    *
-   *
-   * @param $temp_array
-   * @return string
+   * @param $temp_array -> Array of Dates/Prices
+   * @return string -> Returns JSON encoded Dates/Prices array
    */
   public function jsonEncode( $temp_array ){
     return json_encode($temp_array);

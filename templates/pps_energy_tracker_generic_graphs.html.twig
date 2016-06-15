@@ -13,7 +13,7 @@
     </div>
     <div class="graph-content">
        {% if graph_data %}
-           {{ attach_library('pps_energy_tracker/pps_energy_tracker_generic_graph') }}
+           {{ attach_library('pps_energy_tracker/pps_energy_tracker_graph') }}
            <script>
                var dataPoints = [];
                var passedFromController = {{ graph_data|json_encode|raw }};
