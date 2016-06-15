@@ -190,6 +190,7 @@ class ElectricityChartsController {
         //Format string into our array key format
         $monthString = $this->TERM_START->format('M');
         $capFormat = $this->TERM_START->format('M_y');
+        $arrayFormat = $this->PRICING_START->format('Y-m-d');
 
         //September exception
         if($monthString == 'Sep'){
@@ -198,8 +199,9 @@ class ElectricityChartsController {
         }
 
         //Total On/Off Peak Numbers
-        $totalOn += ($peakNumbers[0][$monthString] / 1000);
-        $totalOff += ($peakNumbers[1][$monthString] / 1000);
+        //TODO: Check for undefined index and break
+        $totalOn += ($dataArray[0][$arrayFormat]->$capFormat / 1000) * $peakNumbers[0][$monthString];
+        $totalOff += ($dataArray[1][$arrayFormat]->$capFormat / 1000) * $peakNumbers[1][$monthString];
         $totalCap += $capArray[''][$capFormat];
 
         //Increment by one month
@@ -207,7 +209,7 @@ class ElectricityChartsController {
       }while($this->TERM_START < $this->TERM_END);
 
       //Calculate today's price and store in the array to return
-      $price = $totalOn + $totalOff + $totalCap + ($account[1]->getAdtlCost() * $term_vol);
+      $price = ($totalOn + $totalOff + $totalCap + ($account[1]->getAdtlCost() * $term_vol)) / $term_vol;
       $temp_array[$this->PRICING_START->format('Y-M-d')][] = $price;
 
       //reset TERM Variables and move to the next day
