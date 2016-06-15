@@ -12,7 +12,6 @@ namespace Drupal\pps_energy_tracker\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\pps_energy_tracker\Controller\Generic_Charts_Controller;
 use Drupal\pps_energy_tracker\Controller\GenericChartsController;
 
 class GenericGraphForm extends FormBase{

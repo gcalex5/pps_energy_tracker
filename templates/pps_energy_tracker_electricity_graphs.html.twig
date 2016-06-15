@@ -10,6 +10,9 @@
 <div>
     <p>Hello World: Energy Tracker - Electricity Graphs</p>
     <a href="/energy_tracker">Back to Energy Tracker Home</a>
+    <div id="graph-form">
+        {{ element_content }}
+    </div>
     <div class="graph-content">
         {% if graph_data %}
             {{ attach_library('pps_energy_tracker/pps_energy_tracker_graph') }}

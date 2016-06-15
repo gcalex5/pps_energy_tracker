@@ -39,13 +39,13 @@ class EnergyTrackerController extends ControllerBase {
     );
   }
   public function electricity_graphs(){
-    //TODO:Switch to form input.
-    $foo = new ElectricityChartsController();
-    $electricity_graph_data = $foo->pricingController(15);
-    $foo = 1 + 1;
+    $block_id = ('electricity_graph_form_block');
+    $custom_block = \Drupal::service('plugin.manager.block')->createInstance($block_id, []);
+    $block_content = $custom_block->build();
     return array(
       '#theme' => 'pps_energy_tracker_electricity_graphs',
-      '#graph_data' => $electricity_graph_data,
+      '#element_content' => $block_content,
+      '#graph_data' => $_SESSION['energy_tracker']['electricity_chart_data'],
     );
   }
   public function natural_gas_graphs(){

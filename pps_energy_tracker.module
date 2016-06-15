@@ -25,6 +25,7 @@ function pps_energy_tracker_theme($existing, $type, $theme, $path) {
     'pps_energy_tracker_electricity_graphs' => array(
       'variables' => array(
         'graph_data' => NULL,
+        'element_content' => NULL,
       ),
       'template' => 'pps_energy_tracker_electricity_graphs',
     ),
