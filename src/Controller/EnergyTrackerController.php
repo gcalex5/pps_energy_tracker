@@ -25,6 +25,7 @@ class EnergyTrackerController extends ControllerBase {
    * Generic Charts Controller function
    * Called on page load.
    * Form function then takes over.
+   *
    * AJAX -> Calls to the Generic_Charts_Controller file to generate the graphing points and draws the graph
    * @return array
    */
@@ -38,21 +39,42 @@ class EnergyTrackerController extends ControllerBase {
       '#graph_data' => $_SESSION['energy_tracker']['generic_graph_data'],
     );
   }
+
+  /**
+   *
+   * @return array
+   */
   public function electricity_graphs(){
+    $table_array = NULL;
     $block_id = ('electricity_graph_form_block');
     $custom_block = \Drupal::service('plugin.manager.block')->createInstance($block_id, []);
     $block_content = $custom_block->build();
+    if($_SESSION['energy_tracker']['electricity_chart_account_id']){
+      $table_array = $this->generateElectricityChartTable($_SESSION['energy_tracker']
+        ['electricity_chart_account_id']);
+    }
     return array(
       '#theme' => 'pps_energy_tracker_electricity_graphs',
       '#element_content' => $block_content,
+      '#table_content' => $table_array,
       '#graph_data' => $_SESSION['energy_tracker']['electricity_chart_data'],
     );
   }
+
+  /**
+   *
+   * @return array
+   */
   public function natural_gas_graphs(){
     return array(
       '#theme' => 'pps_energy_tracker_natural_gas_graphs',
     );
   }
+
+  /**
+   *
+   * @return array
+   */
   public function account_management(){
     $block_id = ('account_management_form_block');
     $custom_block = \Drupal::service('plugin.manager.block')->createInstance($block_id, []);
@@ -61,5 +83,32 @@ class EnergyTrackerController extends ControllerBase {
       '#theme' => 'pps_energy_tracker_account_management',
       '#element_content' => $block_content,
     );
+  }
+
+  /**
+   * Generate the render array containing a table of account data for the charted account
+   * 
+   * @param $account_id -> ID of the account we are working with
+   * @return array -> Render array containing the data to construct the table.
+   */
+  //TODO: This does not belong here move it to another file.
+  public function generateElectricityChartTable($account_id){
+    //Query the data
+    $query = "SELECT id,contract_start,contract_end,pricing_start FROM ppsweb_pricemodel.account WHERE id='" .
+      $account_id . "' ORDER BY id";
+    $queried_data = db_query($query)->fetchAllAssoc('id');
+    $header =  array('ID', 'Contract Start', 'Contract End', 'Pricing Start');
+    $data = array();
+    //TODO: Move each series to its own separate row, add the last date/price, and a series # column
+    foreach($queried_data as $row){
+      $data[] = array($row->id, $row->contract_start, $row->contract_end, $row->pricing_start);
+    }
+    $table = array(
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $data,
+    );
+
+    return $table;
   }
 }

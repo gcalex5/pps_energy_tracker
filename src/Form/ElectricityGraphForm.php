@@ -55,6 +55,7 @@ class ElectricityGraphForm extends FormBase{
     $account_id = array_keys($form['graph_name']['#options'])[0];
     $electricity_controller = new ElectricityChartsController();
     $_SESSION['energy_tracker']['electricity_chart_data'] = $electricity_controller->pricingController($account_id);
+    $_SESSION['energy_tracker']['electricity_chart_account_id'] = $account_id;
   }
 
   public function queryAccountData(){
