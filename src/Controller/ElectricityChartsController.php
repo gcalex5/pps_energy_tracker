@@ -224,7 +224,7 @@ class ElectricityChartsController {
       $this->setTerms($account, true);
       $this->PRICING_START->add(new \DateInterval('P1D'));
     }while($this->PRICING_START < $this->MAX_DATE);
-
+    unset($temp_array[0]);
     return $temp_array;
   }
 
