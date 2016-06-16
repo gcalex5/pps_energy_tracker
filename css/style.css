@@ -10,3 +10,28 @@
     float:left;
     margin-left:2em;
 }
+
+/**
+* Electricity Chart Styles
+*/
+#chartContainer{
+    width: 800px;
+    height: 380px;
+}
+
+.graph-top-content, .graph-bottom-content{
+    width:800px;
+    display:block;
+    margin:auto;
+    padding: 0 1em 0 1em;
+    clear:both;
+}
+
+.graph-form{
+    float:left;
+}
+
+.account-table{
+    float:right;
+}
+
