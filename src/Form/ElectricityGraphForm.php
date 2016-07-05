@@ -52,7 +52,7 @@ class ElectricityGraphForm extends FormBase{
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state){
-    $account_id = array_keys($form['graph_name']['#options'])[0];
+    $account_id = $form['graph_name']['#value'];
     $electricity_controller = new ElectricityChartsController();
     $_SESSION['energy_tracker']['electricity_chart_data'] = $electricity_controller->pricingController($account_id);
     $_SESSION['energy_tracker']['electricity_chart_account_id'] = $account_id;

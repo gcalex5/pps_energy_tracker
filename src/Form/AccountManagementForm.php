@@ -188,84 +188,84 @@ class AccountManagementForm extends FormBase{
       '#maxlength'=>128,
       '#required' => TRUE,
     );
-    $form['jan_on_Peak'] = array(
+    $form['jan_on_peak'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Jan On Peak'),
       '#size' => 20,
       '#maxlength' => 128,
       '#required' => TRUE,
     );
-    $form['feb_on_Peak'] = array(
+    $form['feb_on_peak'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Feb On Peak'),
       '#size' => 20,
       '#maxlength' => 128,
       '#required' => TRUE,
     );
-    $form['mar_on_Peak'] = array(
+    $form['mar_on_peak'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Mar On Peak'),
       '#size' => 20,
       '#maxlength' => 128,
       '#required' => TRUE,
     );
-    $form['apr_on_Peak'] = array(
+    $form['apr_on_peak'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Apr On Peak'),
       '#size' => 20,
       '#maxlength' => 128,
       '#required' => TRUE,
     );
-    $form['may_on_Peak'] = array(
+    $form['may_on_peak'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('May On Peak'),
       '#size' => 20,
       '#maxlength' => 128,
       '#required' => TRUE,
     );
-    $form['jun_on_Peak'] = array(
+    $form['jun_on_peak'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Jun On Peak'),
       '#size' => 20,
       '#maxlength' => 128,
       '#required' => TRUE,
     );
-    $form['jul_on_Peak'] = array(
+    $form['jul_on_peak'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Jul On Peak'),
       '#size' => 20,
       '#maxlength' => 128,
       '#required' => TRUE,
     );
-    $form['aug_on_Peak'] = array(
+    $form['aug_on_peak'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Aug On Peak'),
       '#size' => 20,
       '#maxlength' => 128,
       '#required' => TRUE,
     );
-    $form['sep_on_Peak'] = array(
+    $form['sep_on_peak'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Sep On Peak'),
       '#size' => 20,
       '#maxlength' => 128,
       '#required' => TRUE,
     );
-    $form['oct_on_Peak'] = array(
+    $form['oct_on_peak'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Oct On Peak'),
       '#size' => 20,
       '#maxlength' => 128,
       '#required' => TRUE,
     );
-    $form['nov_on_Peak'] = array(
+    $form['nov_on_peak'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Nov On Peak'),
       '#size' => 20,
       '#maxlength' => 128,
       '#required' => TRUE,
     );
-    $form['dec_on_Peak'] = array(
+    $form['dec_on_peak'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Dec On Peak'),
       '#size' => 20,

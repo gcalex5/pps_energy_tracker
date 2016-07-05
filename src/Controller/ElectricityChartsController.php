@@ -252,8 +252,4 @@ class ElectricityChartsController {
   public function jsonEncode( $temp_array ){
     return json_encode($temp_array);
   }
-
-
-
-
 }
