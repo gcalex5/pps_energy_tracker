@@ -171,8 +171,7 @@ class AccountManagementForm extends FormBase{
       '#suffix' => "</div>",
       '#required' => TRUE,
     );
-
-    //TODO: Handle all 12 months seperately
+    
     //On and Off Peak Percentages
     $form['on_peak'] = array(
       '#type' => 'textfield',
@@ -187,10 +186,94 @@ class AccountManagementForm extends FormBase{
       '#title' => $this->t('Off Peak'),
       '#size' => 20,
       '#maxlength'=>128,
+      '#required' => TRUE,
+    );
+    $form['jan_on_Peak'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Jan On Peak'),
+      '#size' => 20,
+      '#maxlength' => 128,
+      '#required' => TRUE,
+    );
+    $form['feb_on_Peak'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Feb On Peak'),
+      '#size' => 20,
+      '#maxlength' => 128,
+      '#required' => TRUE,
+    );
+    $form['mar_on_Peak'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Mar On Peak'),
+      '#size' => 20,
+      '#maxlength' => 128,
+      '#required' => TRUE,
+    );
+    $form['apr_on_Peak'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Apr On Peak'),
+      '#size' => 20,
+      '#maxlength' => 128,
+      '#required' => TRUE,
+    );
+    $form['may_on_Peak'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('May On Peak'),
+      '#size' => 20,
+      '#maxlength' => 128,
+      '#required' => TRUE,
+    );
+    $form['jun_on_Peak'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Jun On Peak'),
+      '#size' => 20,
+      '#maxlength' => 128,
+      '#required' => TRUE,
+    );
+    $form['jul_on_Peak'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Jul On Peak'),
+      '#size' => 20,
+      '#maxlength' => 128,
+      '#required' => TRUE,
+    );
+    $form['aug_on_Peak'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Aug On Peak'),
+      '#size' => 20,
+      '#maxlength' => 128,
+      '#required' => TRUE,
+    );
+    $form['sep_on_Peak'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Sep On Peak'),
+      '#size' => 20,
+      '#maxlength' => 128,
+      '#required' => TRUE,
+    );
+    $form['oct_on_Peak'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Oct On Peak'),
+      '#size' => 20,
+      '#maxlength' => 128,
+      '#required' => TRUE,
+    );
+    $form['nov_on_Peak'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Nov On Peak'),
+      '#size' => 20,
+      '#maxlength' => 128,
+      '#required' => TRUE,
+    );
+    $form['dec_on_Peak'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Dec On Peak'),
+      '#size' => 20,
+      '#maxlength'=> 128,
       '#suffix' => "</div>",
       '#required' => TRUE,
     );
-
+    
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => $this->t('Submit')
@@ -232,16 +315,31 @@ class AccountManagementForm extends FormBase{
     $dec_usage = $form_state->getValue('dec_usage');
     $on_peak = $form_state->getValue('on_peak');
     $off_peak = $form_state->getValue('off_peak');
+    $jan_on_peak = $form_state->getValue('jan_on_peak');
+    $feb_on_peak = $form_state->getValue('feb_on_peak');
+    $mar_on_peak = $form_state->getValue('mar_on_peak');
+    $apr_on_peak = $form_state->getValue('apr_on_peak');
+    $may_on_peak = $form_state->getValue('may_on_peak');
+    $jun_on_peak = $form_state->getValue('jun_on_peak');
+    $jul_on_peak = $form_state->getValue('jul_on_peak');
+    $aug_on_peak = $form_state->getValue('aug_on_peak');
+    $sep_on_peak = $form_state->getValue('sep_on_peak');
+    $oct_on_peak = $form_state->getValue('oct_on_peak');
+    $nov_on_peak = $form_state->getValue('nov_on_peak');
+    $dec_on_peak = $form_state->getValue('dec_on_peak');
 
     /**
      * Store the account usage details
      */
     $query = "INSERT INTO ppsweb_pricemodel.account_usage (adtl_cost, cap_obligation, on_peak_percent," .
       "off_peak_percent, jan_usage, feb_usage, mar_usage, apr_usage, may_usage, jun_usage, jul_usage, aug_usage, " .
-      "sept_usage, oct_usage, nov_usage, dec_usage) VALUES ("
+      "sept_usage, oct_usage, nov_usage, dec_usage, jan_on_peak, feb_on_peak, mar_on_peak, apr_on_peak, may_on_peak, jun_on_peak, jul_on_peak, aug_on_peak, " .
+      "sept_on_peak, oct_on_peak, nov_on_peak, dec_on_peak) VALUES ("
       . $adtl_cost . ", " . $cap_obligation . ", " . $on_peak . ", " . $off_peak . ", " . $jan_usage . ", " . $feb_usage
       . ", " . $mar_usage . ", " .$apr_usage . ", " . $may_usage . ", " . $jun_usage . ", " . $jul_usage . ", " . $aug_usage
-      . ", " . $sep_usage . ", " . $oct_usage . ", " . $nov_usage . ", " . $dec_usage . ")";
+      . ", " . $sep_usage . ", " . $oct_usage . ", " . $nov_usage . ", " . $dec_usage . ", " . $jan_on_peak .", " . $feb_on_peak
+      . ", " . $mar_on_peak . ", " .$apr_on_peak . ", " . $may_on_peak . ", " . $jun_on_peak . ", " . $jul_on_peak . ", " . $aug_on_peak
+      . ", " . $sep_on_peak . ", " . $oct_on_peak . ", " . $nov_on_peak . ", " . $dec_on_peak . ")";
       db_query($query);
 
     /**

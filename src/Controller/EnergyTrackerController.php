@@ -130,11 +130,11 @@ class EnergyTrackerController extends ControllerBase {
     $query = "SELECT id, contract_start,contract_end,pricing_start,business_name,utility_id,target_price FROM ppsweb_pricemodel.account WHERE user_id='" .
     \Drupal::currentUser()->id(). "' ORDER BY id";
     $queried_data = db_query($query)->fetchAllAssoc('id');
-    $header = array('ID', 'Business Name', 'Utility', 'Pricing Start', 'Contract Start', 'Contract End', 'Target Price');
+    $header = array('EDIT', 'ID', 'Business Name', 'Utility', 'Pricing Start', 'Contract Start', 'Contract End', 'Target Price');
     $data = array();
 
     foreach ($queried_data as $row){
-      $data[] = array($row->id, $row->business_name, $row->utility_id, $row->pricing_Start, $row->contract_start, $row->contract_end, $row->target_price);
+      $data[] = array('EDIT', $row->id, $row->business_name, $row->utility_id, $row->pricing_Start, $row->contract_start, $row->contract_end, $row->target_price);
     }
 
     $table = array(
