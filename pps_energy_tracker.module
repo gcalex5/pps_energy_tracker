@@ -19,6 +19,7 @@ function pps_energy_tracker_theme($existing, $type, $theme, $path) {
     'pps_energy_tracker_account_management' => array(
       'variables' => array(
         'element_content' => NULL,
+        'table_content' => NULL,
       ),
       'template' => 'pps_energy_tracker_account_management',
     ),

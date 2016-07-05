@@ -8,7 +8,9 @@
 {{ attach_library('pps_energy_tracker/pps_energy_tracker_css') }}
 
 <div>
-    <p>Hello World: Energy Tracker - Account Management</p>
+    <div id="account-table">
+        {{ table_content }}
+    </div>
 
     <div id="account-form">
         {{ element_content }}

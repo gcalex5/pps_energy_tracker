@@ -79,9 +79,13 @@ class EnergyTrackerController extends ControllerBase {
     $block_id = ('account_management_form_block');
     $custom_block = \Drupal::service('plugin.manager.block')->createInstance($block_id, []);
     $block_content = $custom_block->build();
+
+    $table_array = $this->generateAccountTable();
+
     return array(
       '#theme' => 'pps_energy_tracker_account_management',
       '#element_content' => $block_content,
+      '#table_content' => $table_array,
     );
   }
 
@@ -99,10 +103,40 @@ class EnergyTrackerController extends ControllerBase {
     $queried_data = db_query($query)->fetchAllAssoc('id');
     $header =  array('ID', 'Contract Start', 'Contract End', 'Pricing Start');
     $data = array();
+
     //TODO: Move each series to its own separate row, add the last date/price, and a series # column
     foreach($queried_data as $row){
       $data[] = array($row->id, $row->contract_start, $row->contract_end, $row->pricing_start);
     }
+
+    $table = array(
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $data,
+    );
+
+    return $table;
+  }
+
+  /**
+   * Generate the render array containing a table of account data for the Account Management page
+   *
+   * @return array -> Render array containing the data to construct the table.
+   */
+  //TODO: This does not belong here move it to another file
+  public function generateAccountTable(){
+    //1: Get the user ID, 2: Query up Business name, Utility, Target Price, Pricing Start, Contract Start, Contract End
+    //3: Move it into a table and send it back to the controller to render
+    $query = "SELECT id, contract_start,contract_end,pricing_start,business_name,utility_id,target_price FROM ppsweb_pricemodel.account WHERE user_id='" .
+    \Drupal::currentUser()->id(). "' ORDER BY id";
+    $queried_data = db_query($query)->fetchAllAssoc('id');
+    $header = array('ID', 'Business Name', 'Utility', 'Pricing Start', 'Contract Start', 'Contract End', 'Target Price');
+    $data = array();
+
+    foreach ($queried_data as $row){
+      $data[] = array($row->id, $row->business_name, $row->utility_id, $row->pricing_Start, $row->contract_start, $row->contract_end, $row->target_price);
+    }
+
     $table = array(
       '#theme' => 'table',
       '#header' => $header,
