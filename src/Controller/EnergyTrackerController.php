@@ -134,7 +134,7 @@ class EnergyTrackerController extends ControllerBase {
     $data = array();
 
     foreach ($queried_data as $row){
-      $data[] = array('EDIT', $row->id, $row->business_name, $row->utility_id, $row->pricing_Start, $row->contract_start, $row->contract_end, $row->target_price);
+      $data[] = array($this->t('<a href="account_management/?id='. $row->id .'">EDIT</a>'), $row->id, $row->business_name, $row->utility_id, $row->pricing_Start, $row->contract_start, $row->contract_end, $row->target_price);
     }
 
     $table = array(

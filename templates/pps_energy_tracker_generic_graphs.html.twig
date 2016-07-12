@@ -6,6 +6,13 @@
 #}
 {{ attach_library('pps_energy_tracker/pps_energy_tracker_css') }}
 <div id="energy_tracker_container">
+    <div>
+        <p>Hello World: Energy Tracker</p>
+        <a href="/energy_tracker/electricity_graphs">Electricity Graphs</a> </br>
+        <a href="/energy_tracker/natural_gas_graphs">Natural Gas Graphs</a> </br>
+        <a href="/energy_tracker/account_management">Account Management</a> </br>
+        <a href="/">PPS Home Page</a> </br>
+    </div>
     <div id="graph-form">
         {{ element_content }}
     </div>
@@ -47,5 +54,4 @@
             <div id="chartContainer" style="width: 800px; height: 380px;"></div>
         {% endif %}
     </div>
-    <a href="/energy_tracker">Back to Energy Tracker Home</a>
 </div>
