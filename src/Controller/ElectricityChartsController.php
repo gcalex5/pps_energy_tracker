@@ -40,7 +40,7 @@ class ElectricityChartsController {
     $this->setTerms($account, false);
 
     //Query the data
-    $pricingHolder = $this->queryData($account);
+    $pricingHolder = $this->queryData();
 
     //Reset the terms
     $this->setTerms($account, false);
@@ -62,6 +62,7 @@ class ElectricityChartsController {
    * @return array -> Return and array with the account and usage
    */
   public function pullAccountData($account_id){
+    //TODO: Rewrite query
     $temp_account = db_query('SELECT * FROM ppsweb_pricemodel.account WHERE id=' . $account_id)->fetchAll();
     $temp_usage = db_query('SELECT * FROM ppsweb_pricemodel.account_usage WHERE id=' . $temp_account[0]->usage_id)->fetchAll();
 
@@ -102,6 +103,7 @@ class ElectricityChartsController {
     $offPeakQuery .= "FROM ppsweb_pricemodel.elec_off_peak WHERE purchase_date > '" . $formattedStart . "' ORDER BY purchase_date";
 
     //Query the data
+    //TODO: Rewrite queries
     $temp_array[0] = db_query($offPeakQuery)->fetchAllAssoc('purchase_date');
     $temp_array[1] = db_query($onPeakQuery)->fetchAllAssoc('purchase_date');
     $temp_array[2] = db_query($capacityQuery)->fetchAllAssoc('purchase_date');

@@ -54,17 +54,20 @@ class ElectricityGraphForm extends FormBase{
   public function submitForm(array &$form, FormStateInterface $form_state){
     $account_id = $form['graph_name']['#value'];
     $electricity_controller = new ElectricityChartsController();
-    $_SESSION['energy_tracker']['electricity_chart_data'] = $electricity_controller->pricingController($account_id);
+    $_SESSION['energy_tracker']['electricity_chart_data'] = $electricity_controller
+      ->pricingController($account_id);
     $_SESSION['energy_tracker']['electricity_chart_account_id'] = $account_id;
   }
 
   public function queryAccountData(){
     $transformedAccountData = array();
     //Query the data
-    $query = "SELECT id,usage_id,business_name FROM ppsweb_pricemodel.account WHERE user_id='" . \Drupal::currentUser()->id() . "' ORDER BY id";
+    $query = "SELECT id,usage_id,business_name FROM ppsweb_pricemodel.account "
+      . "WHERE user_id='" . \Drupal::currentUser()->id() . "' ORDER BY id";
+
+    //TODO: rewrite query
     $accountDataSet = db_query($query)->fetchAllAssoc('usage_id');
     
-    //Format the data for the form KEY->id Value->business_name
     foreach($accountDataSet as &$value){
       $transformedAccountData[$value->id] = $value->business_name;
     }

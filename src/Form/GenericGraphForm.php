@@ -1,6 +1,7 @@
 <?php
 /**
- * Form Handler, handles building, submission, and validation of the form on the /energy_tracker/generic_graph page
+ * Form Handler, handles building, submission, and validation of the form
+ * on the /energy_tracker/generic_graph page
  *
  * Created by PhpStorm.
  * User: alexm
@@ -32,12 +33,9 @@ class GenericGraphForm extends FormBase{
     $form['graph_name'] = array(
       '#type' => 'select',
       '#title' => 'Graph: ',
-      '#options' => ['2015', '2016', '2017', '2018', '2015, 2016, 2017', '2016, 2017, 2018'],
+      '#options' => ['2015', '2016', '2017', '2018', '2015, 2016, 2017',
+        '2016, 2017, 2018'],
       '#description' => $this->t('Select A Graph'),
-      //'#ajax' => array(
-      //    'callback' => '$this->ajax_call_graph_type(&$form, $form_state)',
-      //    'wrapper' => 'graph-select-wrapper',
-      //),
     );
 
     //TODO: Have this be responsive to the graph_name select
@@ -46,8 +44,6 @@ class GenericGraphForm extends FormBase{
       '#title' => $selected . ' Graph Types',
       '#prefix' => '<div id="graph-type-wrapper">',
       '#suffix' => '</div>',
-      //'#description' => $this->t('Select A Graph Type'),
-      //'#options' => $this->ajax_graph_type_options($selected),
       '#options' => ['On Peak', 'Off Peak', 'Mixed'],
     );
     
@@ -69,10 +65,13 @@ class GenericGraphForm extends FormBase{
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state){
-    $graph_name = $form['graph_name']['#options'][$form_state->getValue('graph_name')];
-    $graph_type = $form['graph_type']['#options'][$form_state->getValue('graph_type')];
+    $graph_name = $form['graph_name']['#options'][$form_state
+      ->getValue('graph_name')];
+    $graph_type = $form['graph_type']['#options'][$form_state
+      ->getValue('graph_type')];
     $generic_controller = new GenericChartsController();
-    $_SESSION['energy_tracker']['generic_graph_data'] = $generic_controller->pricingController($graph_name, $graph_type);
+    $_SESSION['energy_tracker']['generic_graph_data'] = $generic_controller
+      ->pricingController($graph_name, $graph_type);
   }
 
   /**
