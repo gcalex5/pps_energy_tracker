@@ -50,10 +50,12 @@ class ElectricityChartsController {
     $this->setTerms($account, false, 1);
 
     //Calculate On and Off Peak Volumes
-    $peaks = $this->calculatePeakNumbers($account);
+
 
     foreach($account[2] as $iteration){
       //Run the pricing algorithm
+      $this->setTerms($account, false, $iteration);
+      $peaks = $this->calculatePeakNumbers($account, $iteration);
       $this->setTerms($account, false, $iteration);
       $final_data = $this->pricingGeneration($pricingHolder, $account, $peaks, $iteration);
 
@@ -174,11 +176,52 @@ class ElectricityChartsController {
    * Calculate On and Off Peak Volumes
    *
    * @param $account -> Contains [0]Account and [1]Account Usage Objects
-   * @return array -> Returns array containing the [0]On and [1]Off Peak Numbers
+   * @return array -> Returns array containing the [0]On and [1]Off Peak Numbers [2] Termvol
    */
-  public function calculatePeakNumbers($account){
+  public function calculatePeakNumbers($account, $iteration){
     $on_peak = array();
     $off_peak = array();
+    $termVol = 0.0;
+
+    do{
+      if($this->TERM_START->format('M') == 'Jan'){
+        $termVol += $account[1]->getJanUsage();
+      }
+      if($this->TERM_START->format('M') == 'Feb'){
+        $termVol += $account[1]->getFebUsage();
+      }
+      if($this->TERM_START->format('M') == 'Mar'){
+        $termVol += $account[1]->getMarUsage();
+      }
+      if($this->TERM_START->format('M') == 'Apr'){
+        $termVol += $account[1]->getAprUsage();
+      }
+      if($this->TERM_START->format('M') == 'May'){
+        $termVol += $account[1]->getMayUsage();
+      }
+      if($this->TERM_START->format('M') == 'Jun'){
+        $termVol += $account[1]->getJunUsage();
+      }
+      if($this->TERM_START->format('M') == 'Jul'){
+        $termVol += $account[1]->getJulUsage();
+      }
+      if($this->TERM_START->format('M') == 'Aug'){
+        $termVol += $account[1]->getAugUsage();
+      }
+      if($this->TERM_START->format('M') == 'Sept'){
+        $termVol += $account[1]->getSeptUsage();
+      }
+      if($this->TERM_START->format('M') == 'Oct'){
+        $termVol += $account[1]->getOctUsage();
+      }
+      if($this->TERM_START->format('M') == 'Nov'){
+        $termVol += $account[1]->getNovUsage();
+      }
+      if($this->TERM_START->format('M') == 'Dec'){
+        $termVol += $account[1]->getDecUsage();
+      }
+      $this->TERM_START->add(new \DateInterval('P1M'));
+    }while($this->TERM_START < $this->TERM_END);
 
     //On Peak Volume -> MMM_Usage * (MMM_On_Peak/100)
     $on_peak['Jan'] = $account[1]->getJanUsage() * ($account[1]->getJanOnPeak() / 100);
@@ -208,7 +251,7 @@ class ElectricityChartsController {
     $off_peak['Nov'] = $account[1]->getNovUsage() - $on_peak['Nov'];
     $off_peak['Dec'] = $account[1]->getDecUsage() - $on_peak['Dec'];
 
-    return [$on_peak, $off_peak];
+    return [$on_peak, $off_peak, $termVol];
   }
 
   /**
@@ -216,13 +259,13 @@ class ElectricityChartsController {
    *
    * @param $dataArray [0]->Off Peak [1]->On Peak [2]->Capacity
    * @param $account [0]->Account Object [1]->AccountUsage object [2] -> Active Series
-   * @param $peakNumbers [0]->On Peak Numbers [1]->Off Peak Numbers
+   * @param $peakNumbers [0]->On Peak Numbers [1]->Off Peak Numbers [2]->TermVol
    * @return array Return an array of Dates/Prices
    */
   //TODO: Handle multiple series max of '3'
   public function pricingGeneration($dataArray, $account, $peakNumbers, $iteration){
     $temp_array = array(array());
-    $term_vol = array_sum($peakNumbers[0]) + array_sum($peakNumbers[1]);
+    $term_vol = $peakNumbers[2];
     $utility_key = $account[0]->getUtilityName();
     $utility_key = str_replace(" ", "", $utility_key);
     /**
