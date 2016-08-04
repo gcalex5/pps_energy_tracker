@@ -15,16 +15,14 @@
 * Electricity Chart Styles
 */
 #chartContainer{
-    width: 800px;
     height: 380px;
+    clear: both;
 }
 
 .graph-top-content, .graph-bottom-content{
-    width:800px;
-    display:block;
-    margin:auto;
-    padding: 0 1em 0 1em;
-    clear:both;
+    width: 100%;
+    display: inline-block;
+    margin: auto;
 }
 
 .graph-form{

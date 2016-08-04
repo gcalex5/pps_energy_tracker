@@ -9,7 +9,6 @@
 
 <div>
     <div>
-        <p>Hello World: Energy Tracker</p>
         <a href="/energy_tracker/generic_graphs">Generic</a> </br>
         <a href="/energy_tracker/natural_gas_graphs">Natural Gas Graphs</a> </br>
         <a href="/energy_tracker/account_management">Account Management</a> </br>
@@ -27,6 +26,7 @@
         {% if graph_data %}
             {{ attach_library('pps_energy_tracker/pps_energy_tracker_graph') }}
             <script>
+                var d = new Date();
                 var dataPoints = [];
                 var passedFromController = {{ graph_data|json_encode|raw }};
                 //EX: passedFromController Format -> "2013-03-01"[0.0478175]
@@ -37,16 +37,25 @@
 
                     var chart = new CanvasJS.Chart("chartContainer",
                             {
+                                zoomEnabled: true,
+                                animationEnabled: true,
+                                interactivityEnabled: true,
+                                exportEnabled: true,
+                                exportFileName: "ChartExport-" + d.toTimeString(),
                                 title:{
                                     text: "ACCOUNT NUMBER/NAME" + " Pricing"
                                 },
                                 axisX: {
-                                    valueFormatString: "MMM",
-                                    interval:1,
-                                    intervalType: "month"
+                                    labelAngle: 30,
+                                    valueFormatString: "MMM-YY",
+                                    intervalType: "month",
+                                    title: "Pricing Date"
                                 },
                                 axisY:{
-                                    includeZero: false
+                                    prefix: "$",
+                                    interval: .002,
+                                    includeZero: false,
+                                    title: "Price Per kWh"
                                 },
                                 data: [
                                     {
