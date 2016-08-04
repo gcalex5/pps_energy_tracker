@@ -23,12 +23,13 @@
         </div>
     </div>
     <div class="graph-bottom-content">
-        {% if graph_data %}
+        {% if graph_data and graph_name %}
             {{ attach_library('pps_energy_tracker/pps_energy_tracker_graph') }}
             <script>
                 var d = new Date();
                 var dataPoints = [];
                 var passedFromController = {{ graph_data|json_encode|raw }};
+                var graphName = {{ graph_name|json_encode|raw }};
                 //EX: passedFromController Format -> "2013-03-01"[0.0478175]
                 var parsed = JSON.parse(passedFromController);
                 window.onload = function () {
@@ -43,7 +44,7 @@
                                 exportEnabled: true,
                                 exportFileName: "ChartExport-" + d.toTimeString(),
                                 title:{
-                                    text: "ACCOUNT NUMBER/NAME" + " Pricing"
+                                    text: graphName + " Pricing"
                                 },
                                 axisX: {
                                     labelAngle: 30,

@@ -62,6 +62,7 @@ class EnergyTrackerController extends ControllerBase {
       '#element_content' => $block_content,
       '#table_content' => $table_array,
       '#graph_data' => $_SESSION['energy_tracker']['electricity_chart_data'],
+      '#graph_name' => $_SESSION['energy_tracker']['electricity_chart_name'],
     );
   }
 
@@ -105,19 +106,21 @@ class EnergyTrackerController extends ControllerBase {
   public function generateElectricityChartTable($account_id){
     $con = Database::getConnection();
     $query = $con->select('ppsweb_pricemodel.account', 'x')
-      ->fields('x', array('id', 'contract_start', 'contract_end', 'pricing_start'))
+      ->fields('x', array('id', 'contract_start', 'contract_end', 'pricing_start', 'last_date', 'last_price'))
       ->orderBy('id', 'ASC')
       ->condition('id', $account_id, '=');
     $data = $query->execute();
     $queried_data = $data->fetchAllAssoc('id');
 
-    $header =  array('ID', 'Contract Start', 'Contract End', 'Pricing Start');
+    $header =  array('Series #', 'Contract Start', 'Contract End', 'Pricing Start', 'Last Date', 'Last Price');
     $data = array();
 
     //TODO: Move each series to its own separate row, add the last date/price, and a series # column
+    $x = 0;
     foreach($queried_data as $row){
-      $data[] = array($row->id, $row->contract_start, $row->contract_end, 
-        $row->pricing_start);
+      $x++;
+      $data[] = array($x, $row->contract_start, $row->contract_end,
+        $row->pricing_start, $row->last_date, '$' . round($row->last_price, 4));
     }
 
     $table = array(

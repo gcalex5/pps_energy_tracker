@@ -11,6 +11,11 @@
     margin-left:2em;
 }
 
+#account-table{
+    max-height: 250px;
+    overflow-y: scroll;
+}
+
 /**
 * Electricity Chart Styles
 */

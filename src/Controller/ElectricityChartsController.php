@@ -49,8 +49,12 @@ class ElectricityChartsController {
     $peaks = $this->calculatePeakNumbers($account);
 
     //Run the pricing algorithm
-    $output = $this->jsonEncode($this->pricingGeneration($pricingHolder, $account, $peaks));
+    $final_data = $this->pricingGeneration($pricingHolder, $account, $peaks);
 
+    //Set the last date and price on the account and update
+    $this->updateAccount($account[0], $final_data);
+
+    $output = $this->jsonEncode($final_data);
     //JSON encode the data and pass back to the frontend
     return $output;
   }
@@ -287,5 +291,16 @@ class ElectricityChartsController {
    */
   public function jsonEncode( $temp_array ){
     return json_encode($temp_array);
+  }
+
+  public function updateAccount($account, $finalData){
+    $con = Database::getConnection();
+    end($finalData);
+    $query = $con->update('ppsweb_pricemodel.account')
+      ->fields(array(
+        'last_price' => $finalData[key($finalData)][0],
+        'last_date' => key($finalData)))
+      ->condition('id', $account->getId(), '=');
+    $query->execute();
   }
 }

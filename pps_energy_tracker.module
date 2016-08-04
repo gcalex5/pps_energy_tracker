@@ -31,6 +31,7 @@ function pps_energy_tracker_theme($existing, $type, $theme, $path) {
         'graph_data' => NULL,
         'element_content' => NULL,
         'table_content' => NULL,
+        'graph_name' => NULL,
       ),
       'template' => 'pps_energy_tracker_electricity_graphs',
     ),
