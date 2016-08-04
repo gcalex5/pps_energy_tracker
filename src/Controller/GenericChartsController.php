@@ -14,6 +14,8 @@
 
 namespace Drupal\pps_energy_tracker\Controller;
 
+use Drupal\Core\Database\Database;
+
 class GenericChartsController {
   public $ON_PEAK_PRICES = array(array()); //On Peak Pricing Data
   public $OFF_PEAK_PRICES = array(array()); //Off Peak Pricing Data
@@ -55,47 +57,61 @@ class GenericChartsController {
    * @param $graph_type - the type of graph that needs drawn On/Off/Mixed
    * @return array - Return an array containing the queried data 0 - On Peak 1 - Off Peak
    */
+  //TODO: Have this handle multiple series
   public function queryData($graph_choice, $graph_type){
-    //TODO: Change to 2D Array to handle multiple series
+    $con = Database::getConnection();
+    $formattedStart = $this->PRICING_START->format('Y-m-d');
     $temp_array = array();
+    $fields_array = array();
+    $fields_array[] = 'purchase_date';
 
-    //TODO: Add a for loop here to handle multiple series
-    $query = 'Select purchase_date, ';
     do{
-      $query = $query . $this->TERM_START->format('M_y, ');
+      //TODO: Set Array Date keys correctly here to avoid doing it later in the loop
+      if($this->TERM_START->format('M') == 'Sep'){
+        $fields_array[] = 'Sept_' . $this->TERM_START->format('y');
+      }
+      else{
+        $fields_array[] = $this->TERM_START->format('M_y');
+      }
       $this->ARRAY_DATE_KEYS[] = $this->TERM_START->format('M_y');
       $this->TERM_START->add(new \DateInterval('P1M'));
     }while($this->TERM_START < $this->TERM_END);
-
-    //Remove the last comma
-    $query = preg_replace('/,([^,]*)$/', ' \1', $query);
-
-    //Swap September's abbreviation to match the data set and query on peak numbers
-    $query = str_replace('Sep', 'Sept', $query);
-
-    //Reset dates
+    
     $this->setTerms($graph_choice, $graph_type);
 
-    //TODO: Rewrite queries
-    //Grab only the data we need
-    if($graph_type == 'On Peak'){
-      $query.= "FROM ppsweb_pricemodel.elec_on_peak WHERE purchase_date >= '". 
-        $this->PRICING_START->format('Y-m-d') . "' ORDER BY purchase_date";
-      $temp_array[0] = db_query($query)->fetchAllAssoc('purchase_date');
-    }
-    else if($graph_type == 'Off Peak'){
-      $query.= "FROM ppsweb_pricemodel.elec_off_peak WHERE purchase_date >= '". 
-        $this->PRICING_START->format('Y-m-d') . "' ORDER BY purchase_date";
-      $temp_array[0] = db_query($query)->fetchAllAssoc('purchase_date');
-    }
-    else{
-      $query.= "FROM ppsweb_pricemodel.elec_on_peak WHERE purchase_date >= '". 
-        $this->PRICING_START->format('Y-m-d') . "' ORDER BY purchase_date";
-      $temp_array[0] = db_query($query)->fetchAllAssoc('purchase_date');
 
-      //modify the query string to grab the off peak numbers.
-      $query = str_replace('elec_on_peak', 'elec_off_peak', $query);
-      $temp_array[1] = db_query($query)->fetchAllAssoc('purchase_date');
+    if($graph_type == 'On Peak'){
+      $query = $con->select('ppsweb_pricemodel.elec_on_peak', 'x')
+        ->fields('x', $fields_array)
+        ->orderBy('purchase_date', 'ASC')
+        ->condition('purchase_date', $formattedStart, '>');
+      $data = $query->execute();
+      $temp_array[0] = $data->fetchAllAssoc('purchase_date');
+    }
+
+    else if($graph_type == 'Off Peak'){
+      $query = $con->select('ppsweb_pricemodel.elec_off_peak', 'x')
+        ->fields('x', $fields_array)
+        ->orderBy('purchase_date', 'ASC')
+        ->condition('purchase_date', $formattedStart, '>');
+      $data = $query->execute();
+      $temp_array[0] = $data->fetchAllAssoc('purchase_date');
+    }
+
+    else{
+      $query = $con->select('ppsweb_pricemodel.elec_on_peak', 'x')
+        ->fields('x', $fields_array)
+        ->orderBy('purchase_date', 'ASC')
+        ->condition('purchase_date', $formattedStart, '>');
+      $data = $query->execute();
+      $temp_array[0] = $data->fetchAllAssoc('purchase_date');
+
+      $query = $con->select('ppsweb_pricemodel.elec_off_peak', 'x')
+        ->fields('x', $fields_array)
+        ->orderBy('purchase_date', 'ASC')
+        ->condition('purchase_date', $formattedStart, '>');
+      $data = $query->execute();
+      $temp_array[1] = $data->fetchAllAssoc('purchase_date');
     }
 
     return $temp_array;

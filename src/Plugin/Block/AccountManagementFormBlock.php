@@ -25,7 +25,7 @@ class AccountManagementFormBlock extends BlockBase{
    * @return array - AccountManagementForm
    */
   public function build(){
-    if($_GET['id'] == null){
+    if(!isset($_GET['id'])){
       return \Drupal::formBuilder()
         ->getForm('Drupal\pps_energy_tracker\Form\AccountManagementForm');
     }

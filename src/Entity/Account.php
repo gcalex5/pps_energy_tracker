@@ -14,6 +14,8 @@ class Account {
   
   protected $id;
   protected $user_id;
+  protected $utility_id;
+  protected $utility_name;
   protected $usage_id;
   protected $business_name;
   protected $pricing_start;
@@ -34,6 +36,7 @@ class Account {
   public function __construct($dbData){
     $this->id = $dbData->id;
     $this->usage_id = $dbData->id;
+    $this->utility_id = $dbData->utility_id;
     $this->business_name = $dbData->business_name;
     $this->pricing_start = $dbData->pricing_start;
     $this->contract_start = $dbData->contract_start;
@@ -67,6 +70,30 @@ class Account {
     return $this->user_id;
   }
 
+  /**
+   * @return mixed
+   */
+  public function getUtilityId()
+  {
+    return $this->utility_id;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getUtilityName()
+  {
+    return $this->utility_name;
+  }
+
+  /**
+   * @param mixed $utility_name
+   */
+  public function setUtilityName($utility_name)
+  {
+    $this->utility_name = $utility_name;
+  }
+  
   /**
    * @return mixed
    */

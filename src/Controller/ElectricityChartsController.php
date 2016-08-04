@@ -8,10 +8,10 @@
  * Date: 6/14/2016
  * Time: 8:33 AM
  */
-//TODO: documentation
 
 namespace Drupal\pps_energy_tracker\Controller;
 
+use Drupal\Core\Database\Database;
 use Drupal\pps_energy_tracker\Entity\Account;
 use Drupal\pps_energy_tracker\Entity\AccountUsage;
 
@@ -40,7 +40,7 @@ class ElectricityChartsController {
     $this->setTerms($account, false);
 
     //Query the data
-    $pricingHolder = $this->queryData();
+    $pricingHolder = $this->queryData($account);
 
     //Reset the terms
     $this->setTerms($account, false);
@@ -62,12 +62,31 @@ class ElectricityChartsController {
    * @return array -> Return and array with the account and usage
    */
   public function pullAccountData($account_id){
-    //TODO: Rewrite query
-    $temp_account = db_query('SELECT * FROM ppsweb_pricemodel.account WHERE id=' . $account_id)->fetchAll();
-    $temp_usage = db_query('SELECT * FROM ppsweb_pricemodel.account_usage WHERE id=' . $temp_account[0]->usage_id)->fetchAll();
+    $con = Database::getConnection();
+    
+    $query = $con->select('ppsweb_pricemodel.account', 'x')
+      ->fields('x')
+      ->condition('id', $account_id, '=');
+    $data = $query->execute();
+    $temp_account = $data->fetchAll();
+    
+    $query = $con->select('ppsweb_pricemodel.account_usage', 'x')
+      ->fields('x')
+      ->condition('id', $temp_account[0]->usage_id, '=');
+    $data = $query->execute();
+    $temp_usage = $data->fetchAll();
 
     $account = new Account($temp_account[0]);
     $account_usage = new AccountUsage($temp_usage[0]);
+
+    //Grab and set Utility Name; this should be moved into a JOIN at some point
+    $query = $con->select('ppsweb_pricemodel.utility', 'x')
+      ->fields('x', array('utility_name'))
+      ->condition('utility_id', array($account->getUtilityId()));
+    $data = $query->execute();
+    $temp = $data->fetchAll();
+
+    $account->setUtilityName(trim($temp[0]->utility_name));
 
     return[$account, $account_usage];
   }
@@ -78,35 +97,48 @@ class ElectricityChartsController {
    * @return array -> Return array holding all of the queried data KEYS:[0]->Off Peak [1]->On Peak [2]->Capacity
    */
   //TODO: Have this handle multiple series
-  public function queryData(){
+  public function queryData($account){
+    $con = Database::getConnection();
+    $fields_array = array();
     $temp_array = array();
-    $offPeakQuery = "SELECT purchase_date, ";
+    $formattedStart = $this->PRICING_START->format('Y-m-d');
+    $fields_array[] = 'purchase_date';
 
     //gather the columns in the necessary format
     do{
-      $offPeakQuery = $offPeakQuery . $this->TERM_START->format('M_y, ');
+      //TODO: Set Array Date keys correctly here to avoid doing it later in the loop
+      if($this->TERM_START->format('M') == 'Sep'){
+        $fields_array[] = 'Sept_' . $this->TERM_START->format('y');
+      }
+      else{
+        $fields_array[] = $this->TERM_START->format('M_y');
+      }
       $this->ARRAY_DATE_KEYS[] = $this->TERM_START->format('M_y');
       $this->TERM_START->add(new \DateInterval('P1M'));
     }while($this->TERM_START <= $this->TERM_END);
 
-    //Construct the queries
-    $formattedStart = $this->PRICING_START->format('Y-m-d');
-    //September abbreviation fix
-    $offPeakQuery = str_replace('Sep', 'Sept', $offPeakQuery);
-    //Remove the last comma
-    $offPeakQuery = preg_replace('/,([^,]*)$/', ' \1', $offPeakQuery);
-    //Append the other queries with the correct data
-    $onPeakQuery = $offPeakQuery . "FROM ppsweb_pricemodel.elec_on_peak WHERE purchase_date > '" . $formattedStart . "' ORDER BY purchase_date";
-    $capacityQuery = $offPeakQuery . "FROM ppsweb_pricemodel.elec_capacity";
-    //Remove the purchase date field from the capacity query
-    $capacityQuery = str_replace('purchase_date,', 'utility_name,', $capacityQuery);
-    $offPeakQuery .= "FROM ppsweb_pricemodel.elec_off_peak WHERE purchase_date > '" . $formattedStart . "' ORDER BY purchase_date";
+    //Construct and run the queries
+    $query = $con->select('ppsweb_pricemodel.elec_off_peak', 'x')
+      ->fields('x', $fields_array)
+      ->orderBy('purchase_date', 'ASC')
+      ->condition('purchase_date', $formattedStart, '>');
+    $data = $query->execute();
+    $temp_array[0] = $data->fetchAllAssoc('purchase_date');
 
-    //Query the data
-    //TODO: Rewrite queries
-    $temp_array[0] = db_query($offPeakQuery)->fetchAllAssoc('purchase_date');
-    $temp_array[1] = db_query($onPeakQuery)->fetchAllAssoc('purchase_date');
-    $temp_array[2] = db_query($capacityQuery)->fetchAllAssoc('purchase_date');
+    $query = $con->select('ppsweb_pricemodel.elec_on_peak', 'x')
+      ->fields('x', $fields_array)
+      ->orderBy('purchase_date', 'ASC')
+      ->condition('purchase_date', $formattedStart, '>');
+    $data = $query->execute();
+    $temp_array[1] = $data->fetchAllAssoc('purchase_date');
+
+    $fields_array[0] = 'utility_name';
+    //TODO: Only query the requested utility
+    $query = $con->select('ppsweb_pricemodel.elec_capacity', 'x')
+      ->fields('x', $fields_array)
+      ->condition('utility_name', $account[0]->getUtilityName());
+    $data = $query->execute();
+    $temp_array[2] = $data->fetchAllAssoc('utility_name');
 
     return $temp_array;
   }
@@ -164,6 +196,8 @@ class ElectricityChartsController {
   public function pricingGeneration($dataArray, $account, $peakNumbers){
     $temp_array = array(array());
     $term_vol = array_sum($peakNumbers[0]) + array_sum($peakNumbers[1]);
+    $utility_key = $account[0]->getUtilityName();
+    $utility_key = str_replace(" ", "", $utility_key);
     /**
      * Loop from PRICING_START to MAX_DATE
      * Increment 1 day at a time adding the calculated prices to an array
@@ -204,7 +238,7 @@ class ElectricityChartsController {
         if(isset($dataArray[0][$arrayFormat]->$capFormat) && $dataArray[0][$arrayFormat]->$capFormat != null){
           $totalOn += ($dataArray[0][$arrayFormat]->$capFormat / 1000) * $peakNumbers[0][$monthString];
           $totalOff += ($dataArray[1][$arrayFormat]->$capFormat / 1000) * $peakNumbers[1][$monthString];
-          $totalCap += $capArray[''][$capFormat];
+          $totalCap += $capArray[$account[0]->getUtilityName()][$capFormat];
         }
         //no data found in the arrays for today break and head to the next day
         else{

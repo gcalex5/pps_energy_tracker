@@ -13,6 +13,7 @@
 namespace Drupal\pps_energy_tracker\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Database\Database;
 
 class EnergyTrackerController extends ControllerBase {
 
@@ -102,12 +103,14 @@ class EnergyTrackerController extends ControllerBase {
    */
   //TODO: This does not belong here move it to another file.
   public function generateElectricityChartTable($account_id){
-    //Query the data
-    //TODO: Rewrite query
-    $query = "SELECT id,contract_start,contract_end,pricing_start " . 
-      "FROM ppsweb_pricemodel.account WHERE id='" .
-      $account_id . "' ORDER BY id";
-    $queried_data = db_query($query)->fetchAllAssoc('id');
+    $con = Database::getConnection();
+    $query = $con->select('ppsweb_pricemodel.account', 'x')
+      ->fields('x', array('id', 'contract_start', 'contract_end', 'pricing_start'))
+      ->orderBy('id', 'ASC')
+      ->condition('id', $account_id, '=');
+    $data = $query->execute();
+    $queried_data = $data->fetchAllAssoc('id');
+
     $header =  array('ID', 'Contract Start', 'Contract End', 'Pricing Start');
     $data = array();
 
@@ -134,11 +137,14 @@ class EnergyTrackerController extends ControllerBase {
    */
   //TODO: This does not belong here move it to another file
   public function generateAccountTable(){
-    $query = "SELECT id, contract_start,contract_end,pricing_start,business_name".
-      ",utility_id,target_price FROM ppsweb_pricemodel.account WHERE user_id='" .
-    \Drupal::currentUser()->id(). "' ORDER BY id";
-    //TODO: rewrite queries
-    $queried_data = db_query($query)->fetchAllAssoc('id');
+    $con = Database::getConnection();
+    $query = $con->select('ppsweb_pricemodel.account', 'x')
+      ->fields('x', array('id', 'contract_start', 'contract_end', 'pricing_start', 'business_name', 'utility_id', 'target_price'))
+      ->orderBy('id', 'ASC')
+      ->condition('user_id', \Drupal::currentUser()->id(), '=');
+    $data = $query->execute();
+    $queried_data = $data->fetchAll();
+
     $header = array('EDIT', 'ID', 'Business Name', 'Utility', 'Pricing Start', 
       'Contract Start', 'Contract End', 'Target Price');
     $data = array();
@@ -146,7 +152,7 @@ class EnergyTrackerController extends ControllerBase {
     foreach ($queried_data as $row){
       $data[] = array($this->t(
         '<a href="account_management/?id='. $row->id .'">EDIT</a>'), 
-        $row->id, $row->business_name, $row->utility_id, $row->pricing_Start, 
+        $row->id, $row->business_name, $row->utility_id, $row->pricing_start,
         $row->contract_start, $row->contract_end, $row->target_price);
     }
 
