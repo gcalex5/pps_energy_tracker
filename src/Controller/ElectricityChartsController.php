@@ -25,6 +25,9 @@ class ElectricityChartsController {
   public $PRICING_START = null; //Day that we will start the pricing on.
   public $MAX_DATE =  null; //Last day of pricing.
 
+  public $SMALLEST_DATE = null; //Global constant used for query
+  public $HIGHEST_DATE = null; //Global constant used for query
+
   /**
    * Controller class for Electricity Charts.
    * Receives an 'account id' from the view, Calls the necessary functions, and returns an array of Dates/Prices to the view.
@@ -33,29 +36,35 @@ class ElectricityChartsController {
    * @return array -> return the price/date array
    */
   public function pricingController($account_id){
+    $output = array();
     //Pull Account Information
     $account = $this->pullAccountData($account_id);
 
     //Set the terms
-    $this->setTerms($account, false);
+    $this->setTerms($account, false, 1);
 
     //Query the data
     $pricingHolder = $this->queryData($account);
 
     //Reset the terms
-    $this->setTerms($account, false);
+    $this->setTerms($account, false, 1);
 
     //Calculate On and Off Peak Volumes
     $peaks = $this->calculatePeakNumbers($account);
 
-    //Run the pricing algorithm
-    $final_data = $this->pricingGeneration($pricingHolder, $account, $peaks);
+    foreach($account[2] as $iteration){
+      //Run the pricing algorithm
+      $this->setTerms($account, false, $iteration);
+      $final_data = $this->pricingGeneration($pricingHolder, $account, $peaks, $iteration);
 
-    //Set the last date and price on the account and update
-    $this->updateAccount($account[0], $final_data);
+      //Set the last date and price on the account and update
+      $this->updateAccount($account[0], $final_data);
+      $output[] = $final_data;
+    }
 
-    $output = $this->jsonEncode($final_data);
+
     //JSON encode the data and pass back to the frontend
+    $output = $this->jsonEncode($output);
     return $output;
   }
 
@@ -67,7 +76,10 @@ class ElectricityChartsController {
    */
   public function pullAccountData($account_id){
     $con = Database::getConnection();
-    
+    $active_series = array(); //Tell us which series have a complete start/end
+    $active_series[] = 1;
+    $datesToBeSorted = array();
+
     $query = $con->select('ppsweb_pricemodel.account', 'x')
       ->fields('x')
       ->condition('id', $account_id, '=');
@@ -90,9 +102,20 @@ class ElectricityChartsController {
     $data = $query->execute();
     $temp = $data->fetchAll();
 
-    $account->setUtilityName(trim($temp[0]->utility_name));
+    //Set the utility we are working with
+    $account->setUtilityName($temp[0]->utility_name);
 
-    return[$account, $account_usage];
+    //Log how many iterations we are going for and set the Highest/Smallest dates
+    if($account->getContractStart2() != null && $account->getContractEnd2() != null){
+      $active_series[] = 2;
+    }
+    if($account->getContractStart3() != null && $account->getContractEnd3() != null){
+      $active_series[] = 3;
+    }
+    $this->resetBarriers($account);
+
+    //Return our data
+    return[$account, $account_usage, $active_series];
   }
 
   /**
@@ -111,15 +134,15 @@ class ElectricityChartsController {
     //gather the columns in the necessary format
     do{
       //TODO: Set Array Date keys correctly here to avoid doing it later in the loop
-      if($this->TERM_START->format('M') == 'Sep'){
-        $fields_array[] = 'Sept_' . $this->TERM_START->format('y');
+      if($this->SMALLEST_DATE->format('M') == 'Sep'){
+        $fields_array[] = 'Sept_' . $this->SMALLEST_DATE->format('y');
       }
       else{
-        $fields_array[] = $this->TERM_START->format('M_y');
+        $fields_array[] = $this->SMALLEST_DATE->format('M_y');
       }
-      $this->ARRAY_DATE_KEYS[] = $this->TERM_START->format('M_y');
-      $this->TERM_START->add(new \DateInterval('P1M'));
-    }while($this->TERM_START <= $this->TERM_END);
+      $this->ARRAY_DATE_KEYS[] = $this->SMALLEST_DATE->format('M_y');
+      $this->SMALLEST_DATE->add(new \DateInterval('P1M'));
+    }while($this->SMALLEST_DATE <= $this->HIGHEST_DATE);
 
     //Construct and run the queries
     $query = $con->select('ppsweb_pricemodel.elec_off_peak', 'x')
@@ -192,12 +215,12 @@ class ElectricityChartsController {
    * Generate the pricing array for the view
    *
    * @param $dataArray [0]->Off Peak [1]->On Peak [2]->Capacity
-   * @param $account [0]->Account Object [1]->AccountUsage object
+   * @param $account [0]->Account Object [1]->AccountUsage object [2] -> Active Series
    * @param $peakNumbers [0]->On Peak Numbers [1]->Off Peak Numbers
    * @return array Return an array of Dates/Prices
    */
   //TODO: Handle multiple series max of '3'
-  public function pricingGeneration($dataArray, $account, $peakNumbers){
+  public function pricingGeneration($dataArray, $account, $peakNumbers, $iteration){
     $temp_array = array(array());
     $term_vol = array_sum($peakNumbers[0]) + array_sum($peakNumbers[1]);
     $utility_key = $account[0]->getUtilityName();
@@ -261,7 +284,7 @@ class ElectricityChartsController {
       }
 
       //reset TERM Variables and move to the next day
-      $this->setTerms($account, true);
+      $this->setTerms($account, true, $iteration);
       $this->PRICING_START->add(new \DateInterval('P1D'));
     }while($this->PRICING_START < $this->MAX_DATE);
     unset($temp_array[0]);
@@ -273,14 +296,27 @@ class ElectricityChartsController {
    *
    * @param $account array containing the account/account usage objects Array Keys: [0]->Account [1]->Account Usage
    * @param $skip boolean value that tells us whether or not a full reset
+   * @param $iteration -> value indicating which iteration of the price generating loop we are on
    */
-  public function setTerms($account, $skip){
+  public function setTerms($account, $skip, $iteration){
     if($skip != true){
       $this->PRICING_START = new \DateTime($account[0]->getPricingStart());
     }
-    $this->TERM_START = new \DateTime($account[0]->getContractStart());
-    $this->TERM_END = new \DateTime($account[0]->getContractEnd());
-    $this->MAX_DATE = new \DateTime($account[0]->getContractStart());
+    if($iteration == 1){
+      $this->TERM_START = new \DateTime($account[0]->getContractStart());
+      $this->TERM_END = new \DateTime($account[0]->getContractEnd());
+      $this->MAX_DATE = new \DateTime($account[0]->getContractStart());
+    }
+    elseif($iteration == 2){
+      $this->TERM_START = new \DateTime($account[0]->getContractStart2());
+      $this->TERM_END = new \DateTime($account[0]->getContractEnd2());
+      $this->MAX_DATE = new \DateTime($account[0]->getContractStart2());
+    }
+    else{
+      $this->TERM_START = new \DateTime($account[0]->getContractStart3());
+      $this->TERM_END = new \DateTime($account[0]->getContractEnd3());
+      $this->MAX_DATE = new \DateTime($account[0]->getContractStart3());
+    }
   }
 
   /**
@@ -293,14 +329,55 @@ class ElectricityChartsController {
     return json_encode($temp_array);
   }
 
+  /**
+   * Update the Account in the database with Last Date/price info
+   *
+   * @param $account -> Account we are looking to update
+   * @param $finalData -> Pricing Data we've generated
+   */
   public function updateAccount($account, $finalData){
     $con = Database::getConnection();
     end($finalData);
+    $final_date = key($finalData);
+    $final_price = $finalData[key($finalData)][0];
+    if($final_date == null || $final_price == null){
+      $final_date = '1999-01-01';
+      $final_price = '0.00';
+    }
     $query = $con->update('ppsweb_pricemodel.account')
       ->fields(array(
-        'last_price' => $finalData[key($finalData)][0],
-        'last_date' => key($finalData)))
+        'last_price' => $final_price,
+        'last_date' => $final_date))
       ->condition('id', $account->getId(), '=');
     $query->execute();
+  }
+
+  /**
+   * Reset the Highest/Smallest Dates
+   *
+   * @param $account
+   */
+  public function resetBarriers($account){
+    //Log how many iterations we are going for and set the Highest/Smallest dates
+    $s = new \DateTime($account->getContractStart());
+    $e = new \DateTime($account->getContractEnd());
+    $datesToBeSorted[] =  $s;
+    $datesToBeSorted[] =  $e;
+    if($account->getContractStart2() != null && $account->getContractEnd2() != null){
+      $s = new \DateTime($account->getContractStart2());
+      $e = new \DateTime($account->getContractEnd2());
+      $datesToBeSorted[] =  $s;
+      $datesToBeSorted[] =  $e;
+    }
+    if($account->getContractStart3() != null && $account->getContractEnd3() != null){
+      $s = new \DateTime($account->getContractStart3());
+      $e = new \DateTime($account->getContractEnd3());
+      $datesToBeSorted[] =  $s;
+      $datesToBeSorted[] =  $e;
+    }
+
+    //Set our constants for querying the the right months/years
+    $this->SMALLEST_DATE = min($datesToBeSorted);
+    $this->HIGHEST_DATE = max($datesToBeSorted);
   }
 }
