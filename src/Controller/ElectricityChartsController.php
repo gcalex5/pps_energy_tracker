@@ -201,7 +201,7 @@ class ElectricityChartsController {
         }
 
         //Total On/Off Peak Numbers as well as Capacity
-        if($dataArray[0][$arrayFormat]->$capFormat != null){
+        if(isset($dataArray[0][$arrayFormat]->$capFormat) && $dataArray[0][$arrayFormat]->$capFormat != null){
           $totalOn += ($dataArray[0][$arrayFormat]->$capFormat / 1000) * $peakNumbers[0][$monthString];
           $totalOff += ($dataArray[1][$arrayFormat]->$capFormat / 1000) * $peakNumbers[1][$monthString];
           $totalCap += $capArray[''][$capFormat];
