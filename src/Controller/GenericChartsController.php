@@ -1,8 +1,10 @@
 <?php
 /**
- * Generic_Charts_Controller grabs the input being passed from the GenericGraphForm and then for each series being requested
- * We generate an array of dates and prices that is then passed back to the Energy_Tracker_Controller to be passed into the render array
- * So that the chart library can draw the appropriate graph
+ * Generic_Charts_Controller grabs the input being passed from the 
+ * GenericGraphForm and then for each series being requested We generate an array
+ * of dates and prices that is then passed back to the Energy_Tracker_Controller 
+ * to be passed into the render array So that the chart library can draw the 
+ * appropriate graph
  *
  * Created by PhpStorm.
  * User: Alex
@@ -11,6 +13,8 @@
  */
 
 namespace Drupal\pps_energy_tracker\Controller;
+
+use Drupal\Core\Database\Database;
 
 class GenericChartsController {
   public $ON_PEAK_PRICES = array(array()); //On Peak Pricing Data
@@ -53,43 +57,61 @@ class GenericChartsController {
    * @param $graph_type - the type of graph that needs drawn On/Off/Mixed
    * @return array - Return an array containing the queried data 0 - On Peak 1 - Off Peak
    */
+  //TODO: Have this handle multiple series
   public function queryData($graph_choice, $graph_type){
-    //TODO: Change to 2D Array to handle multiple series
+    $con = Database::getConnection();
+    $formattedStart = $this->PRICING_START->format('Y-m-d');
     $temp_array = array();
+    $fields_array = array();
+    $fields_array[] = 'purchase_date';
 
-    //TODO: Add a for loop here to handle multiple series
-    $query = 'Select purchase_date, ';
     do{
-      $query = $query . $this->TERM_START->format('M_y, ');
+      //TODO: Set Array Date keys correctly here to avoid doing it later in the loop
+      if($this->TERM_START->format('M') == 'Sep'){
+        $fields_array[] = 'Sept_' . $this->TERM_START->format('y');
+      }
+      else{
+        $fields_array[] = $this->TERM_START->format('M_y');
+      }
       $this->ARRAY_DATE_KEYS[] = $this->TERM_START->format('M_y');
       $this->TERM_START->add(new \DateInterval('P1M'));
     }while($this->TERM_START < $this->TERM_END);
-
-    //Remove the last comma
-    $query = preg_replace('/,([^,]*)$/', ' \1', $query);
-
-    //Swap September's abbreviation to match the data set and query on peak numbers
-    $query = str_replace('Sep', 'Sept', $query);
-
-    //Reset dates
+    
     $this->setTerms($graph_choice, $graph_type);
 
-    //Grab only the data we need
-    if($graph_type == 'On Peak'){
-      $query.= "FROM ppsweb_pricemodel.elec_on_peak WHERE purchase_date >= '". $this->PRICING_START->format('Y-m-d') . "' ORDER BY purchase_date";
-      $temp_array[0] = db_query($query)->fetchAllAssoc('purchase_date');
-    }
-    else if($graph_type == 'Off Peak'){
-      $query.= "FROM ppsweb_pricemodel.elec_off_peak WHERE purchase_date >= '". $this->PRICING_START->format('Y-m-d') . "' ORDER BY purchase_date";
-      $temp_array[0] = db_query($query)->fetchAllAssoc('purchase_date');
-    }
-    else{
-      $query.= "FROM ppsweb_pricemodel.elec_on_peak WHERE purchase_date >= '". $this->PRICING_START->format('Y-m-d') . "' ORDER BY purchase_date";
-      $temp_array[0] = db_query($query)->fetchAllAssoc('purchase_date');
 
-      //modify the query string to grab the off peak numbers.
-      $query = str_replace('elec_on_peak', 'elec_off_peak', $query);
-      $temp_array[1] = db_query($query)->fetchAllAssoc('purchase_date');
+    if($graph_type == 'On Peak'){
+      $query = $con->select('ppsweb_pricemodel.elec_on_peak', 'x')
+        ->fields('x', $fields_array)
+        ->orderBy('purchase_date', 'ASC')
+        ->condition('purchase_date', $formattedStart, '>');
+      $data = $query->execute();
+      $temp_array[0] = $data->fetchAllAssoc('purchase_date');
+    }
+
+    else if($graph_type == 'Off Peak'){
+      $query = $con->select('ppsweb_pricemodel.elec_off_peak', 'x')
+        ->fields('x', $fields_array)
+        ->orderBy('purchase_date', 'ASC')
+        ->condition('purchase_date', $formattedStart, '>');
+      $data = $query->execute();
+      $temp_array[0] = $data->fetchAllAssoc('purchase_date');
+    }
+
+    else{
+      $query = $con->select('ppsweb_pricemodel.elec_on_peak', 'x')
+        ->fields('x', $fields_array)
+        ->orderBy('purchase_date', 'ASC')
+        ->condition('purchase_date', $formattedStart, '>');
+      $data = $query->execute();
+      $temp_array[0] = $data->fetchAllAssoc('purchase_date');
+
+      $query = $con->select('ppsweb_pricemodel.elec_off_peak', 'x')
+        ->fields('x', $fields_array)
+        ->orderBy('purchase_date', 'ASC')
+        ->condition('purchase_date', $formattedStart, '>');
+      $data = $query->execute();
+      $temp_array[1] = $data->fetchAllAssoc('purchase_date');
     }
 
     return $temp_array;
@@ -99,6 +121,7 @@ class GenericChartsController {
    * Generates the requested pricing points and returns them to the view
    *
    * @param $data_array - queried array returned from queryData
+   * @param $graph_choice - The years the graph pertains to -> '2015', '2016', '2015, 2016, 2017'
    * @param $graph_type - Type of graph -> 'On Peak', 'Off Peak', 'Mixed'
    * @return string - placeholder return documentation
    */
@@ -114,7 +137,8 @@ class GenericChartsController {
       $current_keys = array_keys($data_array[$i]);
       $this->MAX_DATE = new \DateTime($current_keys[sizeof($current_keys) - 3]);
 
-      //do/while loop runs from PRICING_START until MAX_DATE incrementing one day at a time
+      //do/while loop runs from PRICING_START until MAX_DATE
+      // incrementing one day at a time
       do{
         $current_day_formatted = $this->PRICING_START->format('Y-m-d');
         //Currently only setup to handle On or Off Peak pricing
@@ -122,9 +146,9 @@ class GenericChartsController {
         if(isset($data_array[$i][$current_day_formatted])){
           for($j=0; $j<12; $j++){
             $current_date_key = $this->ARRAY_DATE_KEYS[$j];
-            $current_price = $data_array[$i][$current_day_formatted]->$current_date_key;
+            $current_price = $data_array[$i][$current_day_formatted]
+              ->$current_date_key;
             if($current_price > 0.0001){
-              //Calculate the price point for [Series->current_day_formatted->Month_Year] then add it to our running total
               $monthly_on_total += (($current_price / 1000) * $this->MONTHLY_USAGE);
             }
             else{
@@ -135,20 +159,20 @@ class GenericChartsController {
         }
 
         //TODO: Handle mixed On/Off Peak Pricing
-
         if($monthly_on_total > 0.00001 && $zero_counter < 12){
           /**
            * Calculate the price for today and add it to the pricing list
            * Price = (Term Cost / (Term Vol - (Num Zeroes * 100K ))
            */
-          $price = ($monthly_on_total + $monthly_off_total) / (($this->MONTHLY_USAGE * 12) - ($zero_counter * $this->MONTHLY_USAGE));
+          $price = ($monthly_on_total + $monthly_off_total) / 
+            (($this->MONTHLY_USAGE * 12) - ($zero_counter * $this->MONTHLY_USAGE));
           //Array setup -> $temp_array[For Loop(Series#)[Date][Price]
           $temp_array[$i][$this->PRICING_START->format('Y-m-d')][] = $price;
         }
         else{
           /**
-           * We have 12 0's for our prices, signifying that no pricing has been found for today
-           * So we are going to just skip today and move on.
+           * We have 12 0's for our prices, signifying that no pricing has been
+           * found for today So we are going to just skip today and move on.
            */
         }
         //Flush variables for the next day of pricing
@@ -170,7 +194,8 @@ class GenericChartsController {
    */
   public function septemberFix(){
     for($i=0; $i<sizeof($this->ARRAY_DATE_KEYS); $i++){
-        $this->ARRAY_DATE_KEYS[$i] = str_replace('Sep', 'Sept', $this->ARRAY_DATE_KEYS[$i]);
+        $this->ARRAY_DATE_KEYS[$i] = str_replace('Sep', 'Sept', 
+          $this->ARRAY_DATE_KEYS[$i]);
     }
   }
 
@@ -182,7 +207,8 @@ class GenericChartsController {
    */
   public function setTerms($graph_choice, $graph_type){
     /**
-     * Graph Choice can be: 2015, 2016, 2017, 2018, 2019, (2015, 2016, 2017), (2016, 2017, 2018)
+     * Graph Choice can be: 2015, 2016, 2017, 2018, 2019, (2015, 2016, 2017), 
+     *   (2016, 2017, 2018)
      * Graph Type can be: On Peak, Off Peak, Mixed
      */
     //Set the term
@@ -233,5 +259,4 @@ class GenericChartsController {
     }**/
     return json_encode($temp_array);
   }
-
 }

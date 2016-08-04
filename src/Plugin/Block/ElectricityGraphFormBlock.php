@@ -21,6 +21,7 @@ class ElectricityGraphFormBlock extends BlockBase {
    * @return array - ElectricityGraphForm
    */
   public function build(){
-    return \Drupal::formBuilder()->getForm('Drupal\pps_energy_tracker\Form\ElectricityGraphForm');
+    return \Drupal::formBuilder()
+      ->getForm('Drupal\pps_energy_tracker\Form\ElectricityGraphForm');
   }
 }

@@ -294,7 +294,6 @@ class AccountManagementForm extends FormBase{
   public function submitForm(array &$form, FormStateInterface $form_state){
     //Pull the form data into variables
     $bus_name = $form_state->getValue('bus_name');
-    $utility = $form['utility']['#options'][$form_state->getValue('utility')];
     $pricing_start = $form_state->getValue('pricing_start');
     $contract_s_1 = $form_state->getValue('contract_s_1');
     $contract_e_1 = $form_state->getValue('contract_e_1');
@@ -331,31 +330,46 @@ class AccountManagementForm extends FormBase{
     /**
      * Store the account usage details
      */
-    $query = "INSERT INTO ppsweb_pricemodel.account_usage (adtl_cost, cap_obligation, on_peak_percent," .
-      "off_peak_percent, jan_usage, feb_usage, mar_usage, apr_usage, may_usage, jun_usage, jul_usage, aug_usage, " .
-      "sept_usage, oct_usage, nov_usage, dec_usage, jan_on_peak, feb_on_peak, mar_on_peak, apr_on_peak, may_on_peak, jun_on_peak, jul_on_peak, aug_on_peak, " .
-      "sept_on_peak, oct_on_peak, nov_on_peak, dec_on_peak) VALUES ("
-      . $adtl_cost . ", " . $cap_obligation . ", " . $on_peak . ", " . $off_peak . ", " . $jan_usage . ", " . $feb_usage
-      . ", " . $mar_usage . ", " .$apr_usage . ", " . $may_usage . ", " . $jun_usage . ", " . $jul_usage . ", " . $aug_usage
-      . ", " . $sep_usage . ", " . $oct_usage . ", " . $nov_usage . ", " . $dec_usage . ", " . $jan_on_peak .", " . $feb_on_peak
-      . ", " . $mar_on_peak . ", " .$apr_on_peak . ", " . $may_on_peak . ", " . $jun_on_peak . ", " . $jul_on_peak . ", " . $aug_on_peak
-      . ", " . $sep_on_peak . ", " . $oct_on_peak . ", " . $nov_on_peak . ", " . $dec_on_peak . ")";
-      db_query($query);
+    $query = "INSERT INTO ppsweb_pricemodel.account_usage " . 
+      "(adtl_cost, cap_obligation, on_peak_percent, off_peak_percent, jan_usage," .
+      " feb_usage, mar_usage, apr_usage, may_usage, jun_usage, jul_usage," .
+      " aug_usage, sept_usage, oct_usage, nov_usage, dec_usage, jan_on_peak," . 
+      " feb_on_peak, mar_on_peak, apr_on_peak, may_on_peak, jun_on_peak,". 
+      " jul_on_peak, aug_on_peak, sept_on_peak, oct_on_peak, nov_on_peak," . 
+      " dec_on_peak) VALUES ("
+      . $adtl_cost . ", " . $cap_obligation . ", " . $on_peak . ", " . $off_peak 
+      . ", " . $jan_usage . ", " . $feb_usage . ", " . $mar_usage . ", " 
+      . $apr_usage . ", " . $may_usage . ", " . $jun_usage . ", " . $jul_usage 
+      . ", " . $aug_usage . ", " . $sep_usage . ", " . $oct_usage . ", " 
+      . $nov_usage . ", " . $dec_usage . ", " . $jan_on_peak .", " . $feb_on_peak
+      . ", " . $mar_on_peak . ", " .$apr_on_peak . ", " . $may_on_peak . ", " 
+      . $jun_on_peak . ", " . $jul_on_peak . ", " . $aug_on_peak . ", " 
+      . $sep_on_peak . ", " . $oct_on_peak . ", " . $nov_on_peak . ", " 
+      . $dec_on_peak . ")";
+    
+    //TODO: rewrite query
+    db_query($query);
 
     /**
      * Get the usage_id for what we just inserted
      */
     $second_query = "SELECT last_insert_id() AS id";
+    
+    //TODO: rewrite query
     $usage_id = db_query($second_query)->fetchAll()[0]->id;
 
     /**
      * Store the account details
      */
     //TODO: Utility ID should be dynamically set with the $utility variable. Current set to 3 as a default making it 'OH - Ohio Edison'
-    $third_query = "INSERT INTO ppsweb_pricemodel.account (user_id, utility_id, usage_id, business_name, pricing_start, " .
+    $third_query = "INSERT INTO ppsweb_pricemodel.account (user_id, utility_id, " 
+      . "usage_id, business_name, pricing_start, " .
       "contract_start, contract_end, target_price, last_price, last_date) VALUES ("
-      . \Drupal::currentUser()->id() . ", 3," . $usage_id . ", '" . $bus_name . "', '" . $pricing_start . "', '"
-      . $contract_s_1 . "', '" . $contract_e_1 . "', " . $target_price . ", 0.025, " . "'2016-06-25')";
+      . \Drupal::currentUser()->id() . ", 3," . $usage_id . ", '" . $bus_name 
+      . "', '" . $pricing_start . "', '" . $contract_s_1 . "', '" 
+      . $contract_e_1 . "', " . $target_price . ", 0.025, " . "'2016-06-25')";
+    
+    //TODO: rewrite query
     db_query($third_query);
   }
 }

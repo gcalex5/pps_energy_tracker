@@ -9,7 +9,6 @@
 
 <div>
     <div>
-        <p>Hello World: Energy Tracker</p>
         <a href="/energy_tracker/generic_graphs">Generic</a> </br>
         <a href="/energy_tracker/natural_gas_graphs">Natural Gas Graphs</a> </br>
         <a href="/energy_tracker/account_management">Account Management</a> </br>
@@ -24,37 +23,63 @@
         </div>
     </div>
     <div class="graph-bottom-content">
-        {% if graph_data %}
+        {% if graph_data and graph_name %}
             {{ attach_library('pps_energy_tracker/pps_energy_tracker_graph') }}
             <script>
+                var d = new Date();
                 var dataPoints = [];
                 var passedFromController = {{ graph_data|json_encode|raw }};
+                var graphName = {{ graph_name|json_encode|raw }};
                 //EX: passedFromController Format -> "2013-03-01"[0.0478175]
                 var parsed = JSON.parse(passedFromController);
                 window.onload = function () {
-                    for(var key in parsed)
-                        dataPoints.push({x: new Date(key), y: parsed[key][0]});
-
                     var chart = new CanvasJS.Chart("chartContainer",
                             {
+                                zoomEnabled: true,
+                                animationEnabled: true,
+                                interactivityEnabled: true,
+                                exportEnabled: true,
+                                exportFileName: "ChartExport-" + d.toTimeString(),
                                 title:{
-                                    text: "ACCOUNT NUMBER/NAME" + " Pricing"
+                                    text: graphName + " Pricing"
                                 },
                                 axisX: {
-                                    valueFormatString: "MMM",
-                                    interval:1,
-                                    intervalType: "month"
+                                    labelAngle: 30,
+                                    valueFormatString: "MMM-YY",
+                                    intervalType: "month",
+                                    title: "Pricing Date"
                                 },
                                 axisY:{
-                                    includeZero: false
+                                    prefix: "$",
+                                    interval: .002,
+                                    includeZero: false,
+                                    title: "Price Per kWh"
                                 },
                                 data: [
                                     {
                                         type: "line",
-                                        dataPoints: dataPoints
+                                        dataPoints: [],
+                                        showInLegend: true
                                     }
                                 ]
                             });
+                    for(var row in parsed){
+                        var dataPoints = [];
+                        for(var key in parsed[row]){
+                            dataPoints.push({x: new Date(key), y: parsed[row][key][0]});
+                        }
+                        if(row == 0){
+                            chart.options.data[0].dataPoints = dataPoints;
+                        }
+                        else{
+                            chart.options.data.push({
+                                type: "line",
+                                showInLegend: true,
+                                dataPoints: dataPoints
+                            });
+                        }
+
+                    }
                     chart.render();
                 }
             </script>

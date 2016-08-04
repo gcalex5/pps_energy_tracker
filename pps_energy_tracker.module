@@ -5,11 +5,14 @@
 * This file in particular routes the various pages to the correct TWIG templates.
 */
 
-use Drupal\Core\Routing\RouteMatchInterface;
-
 /**
-* Implements hook_theme()
-*/
+ * Implements hook_theme()
+ * @param $existing
+ * @param $type
+ * @param $theme
+ * @param $path
+ * @return array
+ */
 function pps_energy_tracker_theme($existing, $type, $theme, $path) {
   return array(
     'pps_energy_tracker' => array(
@@ -28,6 +31,7 @@ function pps_energy_tracker_theme($existing, $type, $theme, $path) {
         'graph_data' => NULL,
         'element_content' => NULL,
         'table_content' => NULL,
+        'graph_name' => NULL,
       ),
       'template' => 'pps_energy_tracker_electricity_graphs',
     ),
