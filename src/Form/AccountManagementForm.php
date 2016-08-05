@@ -49,7 +49,6 @@ class AccountManagementForm extends FormBase{
       '#required' => TRUE,
     );
 
-    //TODO: Need to support 3 Contract Start/End's
     $form['contract_s_1'] = array(
       '#type' => 'date',
       '#title' => $this->t('Contract Start'),
@@ -58,6 +57,26 @@ class AccountManagementForm extends FormBase{
     $form['contract_e_1'] = array(
       '#type' => 'date',
       '#title' => $this->t('Contract End'),
+      '#required' => TRUE,
+    );
+    $form['contract_s_2'] = array(
+      '#type' => 'date',
+      '#title' => $this->t('Contract Start 2'),
+      '#required' => TRUE,
+    );
+    $form['contract_e_2'] = array(
+      '#type' => 'date',
+      '#title' => $this->t('Contract End 2'),
+      '#required' => TRUE,
+    );
+    $form['contract_s_3'] = array(
+      '#type' => 'date',
+      '#title' => $this->t('Contract Start 3'),
+      '#required' => TRUE,
+    );
+    $form['contract_e_3'] = array(
+      '#type' => 'date',
+      '#title' => $this->t('Contract End 3'),
       '#required' => TRUE,
     );
 
@@ -297,6 +316,10 @@ class AccountManagementForm extends FormBase{
     $pricing_start = $form_state->getValue('pricing_start');
     $contract_s_1 = $form_state->getValue('contract_s_1');
     $contract_e_1 = $form_state->getValue('contract_e_1');
+    $contract_s_2 = $form_state->getValue('contract_s_2');
+    $contract_e_2 = $form_state->getValue('contract_e_2');
+    $contract_s_3 = $form_state->getValue('contract_s_3');
+    $contract_e_3 = $form_state->getValue('contract_e_3');
     $cap_obligation = $form_state->getValue('cap_obligation');
     $target_price = $form_state->getValue('target_price');
     $adtl_cost = $form_state->getValue('adtl_cost');
@@ -364,10 +387,12 @@ class AccountManagementForm extends FormBase{
     //TODO: Utility ID should be dynamically set with the $utility variable. Current set to 3 as a default making it 'OH - Ohio Edison'
     $third_query = "INSERT INTO ppsweb_pricemodel.account (user_id, utility_id, " 
       . "usage_id, business_name, pricing_start, " .
-      "contract_start, contract_end, target_price, last_price, last_date) VALUES ("
+      "contract_start, contract_end, contract_start_2, contract_end_2, contract_start_3, " .
+      "contract_end_3, target_price, last_price, last_date) VALUES ("
       . \Drupal::currentUser()->id() . ", 3," . $usage_id . ", '" . $bus_name 
       . "', '" . $pricing_start . "', '" . $contract_s_1 . "', '" 
-      . $contract_e_1 . "', " . $target_price . ", 0.025, " . "'2016-06-25')";
+      . $contract_e_1 . "', '". $contract_s_2 . "', '" . $contract_e_2 . "', '" 
+      . $contract_s_3 . "', '" . $contract_e_3 . "', " . $target_price . ", 0.025, " . "'2016-06-25')";
     
     //TODO: rewrite query
     db_query($third_query);
